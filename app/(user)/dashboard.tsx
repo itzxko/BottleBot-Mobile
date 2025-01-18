@@ -20,9 +20,12 @@ import { useUrl } from "@/context/UrlProvider";
 import axios from "axios";
 import RemixIcon from "react-native-remix-icon";
 import { useAuth } from "@/context/AuthContext";
+import Modal from "@/components/modal";
 
 const Dashboard = () => {
-  const { queueWebSocket, addtoQueue } = useQueue();
+  const { queueWebSocket } = useQueue();
+  const [modal, setModal] = useState(false);
+  const [message, setMessage] = useState("");
   const { botLocationWebSocket } = useLocation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -99,6 +102,73 @@ const Dashboard = () => {
         edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
         animated: true,
       });
+    }
+  };
+
+  const haversineDistance = (lat1: any, lon1: any, lat2: any, lon2: any) => {
+    const toRadians = (degree: any) => (degree * Math.PI) / 180;
+
+    const earthRadiusKm = 6371; // Radius of the Earth in kilometers
+
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRadians(lat1)) *
+        Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return earthRadiusKm * c;
+  };
+
+  const addtoQueue = async ({
+    userId,
+    lon,
+    lat,
+    locationName,
+    status,
+  }: {
+    userId: string;
+    lon: number;
+    lat: number;
+    locationName: string;
+    status: string;
+  }) => {
+    const distance = haversineDistance(
+      yourLocation.latitude,
+      yourLocation.longitude,
+      config?.defaultLocation.lat,
+      config?.defaultLocation.lon
+    );
+
+    if (distance <= 1) {
+      try {
+        let url = `http://${ipAddress}:${port}/api/queue`;
+
+        let response = await axios.post(url, {
+          userId: userId,
+          location: {
+            lon: lon,
+            lat: lat,
+            locationName: locationName,
+          },
+          status: status,
+        });
+
+        if (response.data.success === true) {
+          setModal(true);
+          setMessage(response.data.message);
+        }
+      } catch (error: any) {
+        console.log(error.response.data);
+      }
+    } else {
+      setModal(true);
+      setMessage("Location out of Operating Range");
     }
   };
 
@@ -180,7 +250,9 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${yourLocation.latitude.toString()}, ${yourLocation.longitude.toString()}`}
+                    value={`${yourLocation.latitude.toFixed(
+                      4
+                    )}, ${yourLocation.longitude.toFixed(4)}`}
                   ></TextInput>
                 </View>
                 {/* User */}
@@ -205,22 +277,24 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${yourLocation.latitude.toString()}, ${yourLocation.longitude.toString()}`}
+                    value={`${yourLocation.latitude.toFixed(
+                      4
+                    )}, ${yourLocation.longitude.toFixed(4)}`}
                   />
                 </View>
                 <View className="w-full flex items-center justify-center py-4">
                   <TouchableHighlight
                     className="w-full flex items-center justify-center rounded-xl"
                     underlayColor={"#41917F"}
-                    onPress={() =>
+                    onPress={() => {
                       addtoQueue({
-                        userId: user?._id,
+                        userId: user ? user._id : "",
                         lon: yourLocation.longitude,
                         lat: yourLocation.latitude,
                         locationName: "shitty place",
                         status: "pending",
-                      })
-                    }
+                      });
+                    }}
                   >
                     <LinearGradient
                       colors={["#699900", "#466600"]}
@@ -246,6 +320,15 @@ const Dashboard = () => {
             checkConfig();
           }}
           config={config}
+        />
+      )}
+      {modal && (
+        <Modal
+          message={message}
+          isVisible={modal}
+          onClose={() => setModal(false)}
+          header="Queue"
+          icon="profile"
         />
       )}
     </>

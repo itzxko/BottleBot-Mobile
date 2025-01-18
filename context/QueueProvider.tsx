@@ -7,6 +7,7 @@ const QueueContext = createContext<any>(null);
 export const QueueProvider = ({ children }: any) => {
   const [queue, setQueue] = useState([]);
   const { ipAddress, port } = useUrl();
+  const [queueModal, setQueueModal] = useState(false);
 
   const queueWebSocket = () => {
     const socket = new WebSocket(`ws://${ipAddress}:${port}/api/queue`);
@@ -45,39 +46,15 @@ export const QueueProvider = ({ children }: any) => {
     }
   };
 
-  const addtoQueue = async ({
-    userId,
-    lon,
-    lat,
-    locationName,
-    status,
-  }: {
-    userId: string;
-    lon: number;
-    lat: number;
-    locationName: string;
-    status: string;
-  }) => {
-    try {
-      let url = `http://${ipAddress}:${port}/api/queue`;
-
-      let response = await axios.post(url, {
-        userId: userId,
-        location: {
-          lon: lon,
-          lat: lat,
-          locationName: locationName,
-        },
-        status: status,
-      });
-    } catch (error: any) {
-      console.log(error.response.data);
-    }
-  };
-
   return (
     <QueueContext.Provider
-      value={{ queue, queueWebSocket, deleteFromQueue, addtoQueue }}
+      value={{
+        queue,
+        queueWebSocket,
+        deleteFromQueue,
+        queueModal,
+        setQueueModal,
+      }}
     >
       {children}
     </QueueContext.Provider>

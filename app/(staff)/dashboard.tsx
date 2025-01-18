@@ -191,7 +191,9 @@ const Dashboard = () => {
                     readOnly={true}
                     value={
                       botLocation
-                        ? `${botLocation.lat.toString()}, ${botLocation.lon.toString()}`
+                        ? `${botLocation.lat.toFixed(
+                            4
+                          )}, ${botLocation.lon.toFixed(4)}`
                         : "No Location"
                     }
                   ></TextInput>
@@ -218,7 +220,9 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${yourLocation.latitude.toString()}, ${yourLocation.longitude.toString()}`}
+                    value={`${yourLocation.latitude.toFixed(
+                      4
+                    )}, ${yourLocation.longitude.toFixed(4)}`}
                   ></TextInput>
                 </View>
                 {/* Default */}
@@ -244,7 +248,9 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${config?.defaultLocation.lat}, ${config?.defaultLocation.lon}`}
+                    value={`${config?.defaultLocation.lat.toFixed(
+                      4
+                    )}, ${config?.defaultLocation.lon.toFixed(4)}`}
                   ></TextInput>
                 </View>
               </View>
