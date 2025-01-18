@@ -650,8 +650,8 @@ const History = () => {
               {pointsHistory.length > 0 ? (
                 pointsHistory.map(
                   (pointHistory: PointsHistory, index: number) => {
-                    const reward = redeemables.find(
-                      (reward: RedeemableItem) => reward._id === "hehe"
+                    const nonMobileUser = pointsHistory.find(
+                      (history: any) => !history.userId
                     );
 
                     const firstItem = index === 0;
@@ -670,13 +670,7 @@ const History = () => {
                       >
                         <ImageBackground
                           className="w-full h-full "
-                          source={
-                            reward
-                              ? {
-                                  uri: `http://192.168.254.139:8080/api/images/${reward.image}`,
-                                }
-                              : require("../../assets/images/Man.jpg")
-                          }
+                          source={require("../../assets/images/Man.jpg")}
                         >
                           <LinearGradient
                             className="w-full h-full p-5"
@@ -737,7 +731,9 @@ const History = () => {
                                     className="text-sm font-semibold text-white capitalize"
                                     numberOfLines={1}
                                   >
-                                    {`${pointHistory.userInfo.personalInfo.firstName} ${pointHistory.userInfo.personalInfo.lastName}`}
+                                    {pointHistory.userInfo
+                                      ? `${pointHistory.userInfo.personalInfo.firstName} ${pointHistory.userInfo.personalInfo.lastName}`
+                                      : "Non-Mobile User"}
                                   </Text>
                                 </View>
                                 <View className="w-full overflow-hidden flex flex-row justify-start items-center">

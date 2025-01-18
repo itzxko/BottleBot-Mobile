@@ -219,12 +219,12 @@ const History: React.FC = () => {
         >
           {/* rewardsearch */}
           <View className="w-full flex flex-row items-center justify-between px-4 pt-4">
-            <View className="w-full flex flex-row items-center justify-between  pl-6 py-3 pr-3 rounded-full bg-[#FCFCFC]">
-              <Text className="text-xs font-normal">
+            <View className="w-full flex flex-row items-center justify-between  pl-6 py-2 pr-2 rounded-full bg-[#FCFCFC]">
+              <Text className="text-xs font-normal text-black/50">
                 {`${
                   rewardStartDate || rewardEndDate
                     ? `${rewardStartDate || ""} to ${rewardEndDate || ""}`
-                    : "Select Dates to Filter"
+                    : "Filter Date"
                 }`}
               </Text>
               <View className="flex flex-row items-center justify-center space-x-2">
@@ -475,8 +475,8 @@ const History: React.FC = () => {
             ) : null}
           </View>
           <View className="w-full flex flex-row items-center justify-between px-4 pt-4">
-            <View className="w-full flex flex-row items-center justify-between  pl-6 py-3 pr-3 rounded-full bg-[#FCFCFC]">
-              <Text className="text-xs font-normal">
+            <View className="w-full flex flex-row items-center justify-between  pl-6 py-2 pr-2 rounded-full bg-[#FCFCFC]">
+              <Text className="text-xs font-normal text-black/50">
                 {`${
                   pointsStartDate || pointsEndDate
                     ? `${pointsStartDate || ""} to ${pointsEndDate || ""}`
@@ -552,10 +552,6 @@ const History: React.FC = () => {
               {pointsHistory.length > 0 ? (
                 pointsHistory.map(
                   (pointHistory: PointHistory, index: number) => {
-                    const reward = rewards.find(
-                      (reward: Reward) => reward._id === "hehe"
-                    );
-
                     const firstItem = index === 0;
                     const lastItem = index === pointsHistory.length - 1;
 
@@ -572,13 +568,7 @@ const History: React.FC = () => {
                       >
                         <ImageBackground
                           className="w-full h-full "
-                          source={
-                            reward
-                              ? {
-                                  uri: `http://192.168.254.139:8080/api/images/${reward.image}`,
-                                }
-                              : require("../../assets/images/Man.jpg")
-                          }
+                          source={require("../../assets/images/Man.jpg")}
                         >
                           <LinearGradient
                             className="w-full h-full p-5"

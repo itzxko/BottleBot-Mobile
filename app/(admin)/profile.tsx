@@ -253,7 +253,7 @@ const profile = () => {
             onPress={handleLogout}
           >
             <View className="p-2.5 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <RemixIcon name="door-open-line" size={14} color="black" />
+              <RemixIcon name="ri-logout-box-r-line" size={14} color="black" />
             </View>
           </TouchableHighlight>
           <Text className="text-sm font-semibold">Profile</Text>

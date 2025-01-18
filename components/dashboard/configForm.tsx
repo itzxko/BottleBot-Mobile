@@ -89,6 +89,11 @@ const ConfigForm = ({
   };
 
   useEffect(() => {
+    setBaseUnit("kg");
+    console.log(baseUnit);
+  }, [baseUnit]);
+
+  useEffect(() => {
     if (config) {
       setLocationName(config.defaultLocation.locationName);
       setLat(config.defaultLocation.lat.toString());

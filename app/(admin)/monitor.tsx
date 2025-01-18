@@ -274,7 +274,7 @@ const monitor = () => {
             {queue.length > 0 ? (
               queue.map((request: queue) => (
                 <View
-                  className="w-full flex flex-row items-start justify-between gap-x-4 pb-8"
+                  className="w-full flex flex-row items-center justify-start gap-x-4 pb-8"
                   key={request._id}
                 >
                   <Pressable
@@ -293,7 +293,7 @@ const monitor = () => {
                       }
                     />
                   </Pressable>
-                  <View className="w-full flex flex-col items-start justify-start">
+                  <View className="w-4/5 flex flex-col items-start justify-start">
                     <Text
                       className="text-sm font-semibold uppercase"
                       numberOfLines={1}
@@ -301,7 +301,7 @@ const monitor = () => {
                       {`${request.userId.personalInfo.firstName} ${request.userId.personalInfo.middleName} ${request.userId.personalInfo.lastName}`}
                     </Text>
                     <Text
-                      className="text-xs font-normal text-black/50 capitalize"
+                      className="text-xs font-normal text-black/50 capitalize truncate w-full"
                       numberOfLines={1}
                     >
                       {request.location.locationName}

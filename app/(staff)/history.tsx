@@ -417,49 +417,9 @@ const History = () => {
                                             color="white"
                                           />
                                         </Pressable>
-                                        {/* <Pressable
-                                          onPress={() =>
-                                            archiveRewardHistory(
-                                              rewardHistory._id
-                                            )
-                                          }
-                                        >
-                                          <RemixIcon
-                                            name="archive-line"
-                                            size={16}
-                                            color="white"
-                                          />
-                                        </Pressable> */}
                                       </>
                                     ) : (
-                                      <>
-                                        {/* <Pressable
-                                          className="mr-4"
-                                          onPress={() => {
-                                            setHistoryData(rewardHistory._id);
-                                            setRewardsArchiveForm(true);
-                                          }}
-                                        >
-                                          <RemixIcon
-                                            name="edit-2-line"
-                                            size={16}
-                                            color="white"
-                                          />
-                                        </Pressable>
-                                        <Pressable
-                                          onPress={() =>
-                                            unarchiveRewardHistory(
-                                              rewardHistory
-                                            )
-                                          }
-                                        >
-                                          <RemixIcon
-                                            name="inbox-unarchive-line"
-                                            size={16}
-                                            color="white"
-                                          />
-                                        </Pressable> */}
-                                      </>
+                                      <></>
                                     )}
                                   </View>
                                 </View>
@@ -645,10 +605,6 @@ const History = () => {
               {pointsHistory.length > 0 ? (
                 pointsHistory.map(
                   (pointHistory: PointsHistory, index: number) => {
-                    const reward = redeemables.find(
-                      (reward: RedeemableItem) => reward._id === "hehe"
-                    );
-
                     const firstItem = index === 0;
                     const lastItem = index === pointsHistory.length - 1;
 
@@ -665,13 +621,7 @@ const History = () => {
                       >
                         <ImageBackground
                           className="w-full h-full "
-                          source={
-                            reward
-                              ? {
-                                  uri: `http://192.168.254.139:8080/api/images/${reward.image}`,
-                                }
-                              : require("../../assets/images/Man.jpg")
-                          }
+                          source={require("../../assets/images/Man.jpg")}
                         >
                           <LinearGradient
                             className="w-full h-full p-5"
@@ -690,54 +640,6 @@ const History = () => {
                                 >
                                   #{pointHistory._id}
                                 </Text>
-                                <View className="max-w-[40%] flex flex-row items-center justify-end">
-                                  {/* <View className="py-3 px-4 rounded-full flex flex-row bg-[#050301]/50">
-                                    {pointHistory.archiveDate === null ? (
-                                      <>
-                                        <Pressable
-                                          onPress={() =>
-                                            archivePointHistory(
-                                              pointHistory._id
-                                            )
-                                          }
-                                        >
-                                          <RemixIcon
-                                            name="archive-line"
-                                            size={16}
-                                            color="white"
-                                          />
-                                        </Pressable>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Pressable
-                                          className="pr-4"
-                                          onPress={() => {
-                                            setPointsArchiveForm(true);
-                                            setPointHistoryId(pointHistory._id);
-                                          }}
-                                        >
-                                          <RemixIcon
-                                            name="folder-history-line"
-                                            size={16}
-                                            color="white"
-                                          />
-                                        </Pressable>
-                                        <Pressable
-                                          onPress={() =>
-                                            unarchivePointHistory(pointHistory)
-                                          }
-                                        >
-                                          <RemixIcon
-                                            name="inbox-unarchive-line"
-                                            size={16}
-                                            color="white"
-                                          />
-                                        </Pressable>
-                                      </>
-                                    )}
-                                  </View> */}
-                                </View>
                               </View>
                               <View className="w-full flex items-start justify-center">
                                 <View className="w-full flex items-start justify-center pb-4">
@@ -745,7 +647,9 @@ const History = () => {
                                     className="text-sm font-semibold text-white capitalize"
                                     numberOfLines={1}
                                   >
-                                    {`${pointHistory.userInfo.personalInfo.firstName} ${pointHistory.userInfo.personalInfo.lastName}`}
+                                    {pointHistory.userInfo
+                                      ? `${pointHistory.userInfo.personalInfo.firstName} ${pointHistory.userInfo.personalInfo.lastName}`
+                                      : "Non-Mobile User"}
                                   </Text>
                                 </View>
                                 <View className="w-full overflow-hidden flex flex-row justify-start items-center">
