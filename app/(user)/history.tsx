@@ -234,7 +234,7 @@ const History: React.FC = () => {
                 >
                   <LinearGradient
                     className="flex p-3 rounded-full"
-                    colors={["#699900", "#466600"]}
+                    colors={["#474747", "#050301"]}
                   >
                     <RemixIcon name="calendar-line" size={12} color="white" />
                   </LinearGradient>
@@ -490,7 +490,7 @@ const History: React.FC = () => {
                 >
                   <LinearGradient
                     className="flex p-3 rounded-full"
-                    colors={["#699900", "#466600"]}
+                    colors={["#474747", "#050301"]}
                   >
                     <RemixIcon name="calendar-line" size={12} color="white" />
                   </LinearGradient>
