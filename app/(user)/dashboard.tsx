@@ -125,6 +125,27 @@ const Dashboard = () => {
     return earthRadiusKm * c;
   };
 
+  const getLocation = async (latitude: any, longitude: any) => {
+    const apiKey = "72d5a1df72ec497ea48fbb7f2842a176";
+    console.log(latitude, longitude);
+
+    const url = `https://api.opencagedata.com/geocode/v1/json?q=${latitude},${longitude}&key=${apiKey}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (response.ok && data.results.length > 0) {
+        return data.results[0].formatted; // Return the formatted address
+      } else {
+        throw new Error(data.status.message || "Unable to fetch location");
+      }
+    } catch (error: any) {
+      console.error("Error fetching location:", error.message);
+      return null; // Return null on failure
+    }
+  };
+
   const addtoQueue = async ({
     userId,
     lon,
@@ -145,7 +166,12 @@ const Dashboard = () => {
       config?.defaultLocation.lon
     );
 
-    if (distance <= 1) {
+    const userLoc = await getLocation(
+      yourLocation.latitude,
+      yourLocation.longitude
+    );
+
+    if (distance <= 1 && userLoc) {
       try {
         let url = `http://${ipAddress}:${port}/api/queue`;
 
@@ -154,7 +180,7 @@ const Dashboard = () => {
           location: {
             lon: lon,
             lat: lat,
-            locationName: locationName,
+            locationName: userLoc,
           },
           status: status,
         });
