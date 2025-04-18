@@ -29,7 +29,7 @@ const redeem = () => {
   const [filter, setFilter] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [checkoutModal, setCheckoutModal] = useState(false);
   const [rewardsForm, setRewardsForm] = useState(false);
   const [rewardId, setRewardId] = useState("");
@@ -76,7 +76,7 @@ const redeem = () => {
     setLoading(true);
 
     try {
-      let url = `http://${ipAddress}:${port}/api/rewards/${rewardId}`;
+      let url = `${urlString}/api/rewards/${rewardId}`;
 
       let response = await axios.delete(url);
 
@@ -117,7 +117,7 @@ const redeem = () => {
     formData.append("image", reward.image);
 
     try {
-      let url = `http://${ipAddress}:${port}/api/rewards/${reward._id}`;
+      let url = `${urlString}/api/rewards/${reward._id}`;
 
       let response = await axios.post(url, formData, {
         headers: {
@@ -275,7 +275,7 @@ const redeem = () => {
                     <ImageBackground
                       className="w-full flex-1"
                       source={{
-                        uri: `http://${ipAddress}:${port}/api/images/${item.image}`,
+                        uri: `${urlString}/api/images/${item.image}`,
                       }}
                     >
                       <Pressable

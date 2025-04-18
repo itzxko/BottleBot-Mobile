@@ -27,7 +27,7 @@ const RewardHistoryAdd = ({ onClose }: { onClose: () => void }) => {
   const [filter, setFilter] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [chooseModal, setChooseModal] = useState(false);
   const [selectedReward, setSelectedReward] = useState<Item | null>(null);
   const [userSearch, setUserSearch] = useState("");
@@ -163,7 +163,7 @@ const RewardHistoryAdd = ({ onClose }: { onClose: () => void }) => {
                     <ImageBackground
                       className="w-full flex-1"
                       source={{
-                        uri: `http://${ipAddress}:${port}/api/images/${item.image}`,
+                        uri: `${urlString}/api/images/${item.image}`,
                       }}
                     ></ImageBackground>
                   </View>

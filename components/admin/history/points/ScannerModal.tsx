@@ -30,9 +30,10 @@ export default function ScannerModal({ onClose }: { onClose: () => void }) {
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
 
   interface data {
+    transactId: string;
     did: string;
     uid: string;
     bc: number;
@@ -45,17 +46,17 @@ export default function ScannerModal({ onClose }: { onClose: () => void }) {
     setScanned(true);
 
     try {
-      const parsedData = JSON.parse(data);
+      const scannedData = JSON.parse(data);
 
-      if (!parsedData.uid) {
+      if (!scannedData.uid) {
         setVisibleModal(true);
         setMessage("History is for Mobile Users Only");
         setIsError(false);
-      } else if (parsedData.uid) {
-        if (parsedData.did) {
-          updatePointsHistory(parsedData);
-        } else if (!parsedData.did) {
-          await addPointsHistory(parsedData);
+      } else if (scannedData.uid) {
+        if (scannedData.transactId) {
+          updatePointsHistory(scannedData);
+        } else if (!scannedData.transactId) {
+          await addPointsHistory(scannedData);
         }
       }
     } catch (error: any) {
@@ -67,7 +68,7 @@ export default function ScannerModal({ onClose }: { onClose: () => void }) {
 
   const updatePointsHistory = async (data: data) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose/${data.did}`;
+      let url = `${urlString}/api/history/dispose/${data.transactId}`;
       console.log(data.did);
 
       let response = await axios.put(url, {
@@ -91,7 +92,7 @@ export default function ScannerModal({ onClose }: { onClose: () => void }) {
 
   const addPointsHistory = async (data: data) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose`;
+      let url = `${urlString}/api/history/dispose`;
 
       let response = await axios.post(url, {
         userId: data.uid,

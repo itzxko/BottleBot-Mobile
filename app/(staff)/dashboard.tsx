@@ -45,28 +45,15 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    const getLocation = async () => {
-      setLoading(true);
-      await getUserLocation();
-      setLoading(false);
-    };
-
-    queueWebSocket();
-    botLocationWebSocket();
-    getLocation();
-    getConfig();
-  }, []);
-
-  useEffect(() => {
-    if (yourLocation && config?.defaultLocation) {
+    if (botLocation && config?.defaultLocation) {
       handleZoomToLocations();
     }
-  }, [yourLocation, config]);
+  }, [config, botLocation]);
 
   const handleZoomToLocations = () => {
-    if (mapViewRef.current && yourLocation && config?.defaultLocation) {
+    if (mapViewRef.current && botLocation && config?.defaultLocation) {
       const locations = [
-        { latitude: yourLocation.latitude, longitude: yourLocation.longitude },
+        { latitude: botLocation.latitude, longitude: botLocation.longitude },
         {
           latitude: config.defaultLocation.lat,
           longitude: config.defaultLocation.lon,
@@ -74,7 +61,7 @@ const Dashboard = () => {
       ];
 
       mapViewRef.current.fitToCoordinates(locations, {
-        edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+        edgePadding: { top: 200, right: 200, bottom: 200, left: 200 },
         animated: true,
       });
     }
@@ -86,7 +73,11 @@ const Dashboard = () => {
         <View className="flex-1 w-full">
           <View className="w-full flex-1 relative">
             {/* Map Background */}
-            <MapView style={{ width: "100%", height: "60%" }} ref={mapViewRef}>
+            <MapView
+              style={{ width: "100%", height: "80%" }}
+              provider="google"
+              ref={mapViewRef}
+            >
               {queue &&
                 queue.map((queue: any) => (
                   <Marker
@@ -107,8 +98,8 @@ const Dashboard = () => {
               {botLocation ? (
                 <Marker
                   coordinate={{
-                    latitude: botLocation.lat,
-                    longitude: botLocation.lon,
+                    latitude: botLocation.latitude,
+                    longitude: botLocation.longitude,
                   }}
                   title="Bot Location"
                 >
@@ -118,12 +109,7 @@ const Dashboard = () => {
                   />
                 </Marker>
               ) : null}
-              <Marker coordinate={yourLocation} title="Your Location">
-                <Image
-                  source={require("../../assets/images/Admin-Pin.png")}
-                  className="w-[56px] h-[56px]"
-                />
-              </Marker>
+
               {config && (
                 <Marker
                   coordinate={{
@@ -191,40 +177,14 @@ const Dashboard = () => {
                     readOnly={true}
                     value={
                       botLocation
-                        ? `${botLocation.lat.toFixed(
+                        ? `${botLocation.latitude.toFixed(
                             4
-                          )}, ${botLocation.lon.toFixed(4)}`
-                        : "No Location"
+                          )}, ${botLocation.longitude.toFixed(4)}`
+                        : "Waiting for Data"
                     }
                   ></TextInput>
                 </View>
-                {/* User */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
-                    <Pressable>
-                      <RemixIcon
-                        name="direction-line"
-                        size={16}
-                        color="white"
-                      />
-                    </Pressable>
-                    <Text
-                      className="text-xs font-normal text-white pl-2"
-                      numberOfLines={1}
-                    >
-                      Your Location
-                    </Text>
-                  </View>
-                  <TextInput
-                    className="text-xs font-normal max-w-[50%] text-right"
-                    placeholder="single"
-                    numberOfLines={1}
-                    readOnly={true}
-                    value={`${yourLocation.latitude.toFixed(
-                      4
-                    )}, ${yourLocation.longitude.toFixed(4)}`}
-                  ></TextInput>
-                </View>
+
                 {/* Default */}
                 <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
                   <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
@@ -248,9 +208,13 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${config?.defaultLocation.lat.toFixed(
-                      4
-                    )}, ${config?.defaultLocation.lon.toFixed(4)}`}
+                    value={
+                      config
+                        ? `${config.defaultLocation.lat.toFixed(
+                            4
+                          )}, ${config.defaultLocation.lon.toFixed(4)}`
+                        : "Waiting for Data"
+                    }
                   ></TextInput>
                 </View>
               </View>

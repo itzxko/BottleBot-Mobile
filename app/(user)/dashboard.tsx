@@ -21,18 +21,21 @@ import axios from "axios";
 import RemixIcon from "react-native-remix-icon";
 import { useAuth } from "@/context/AuthContext";
 import Modal from "@/components/modal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Dashboard = () => {
   const { queueWebSocket } = useQueue();
   const [modal, setModal] = useState(false);
   const [message, setMessage] = useState("");
-  const { botLocationWebSocket } = useLocation();
+  const { botLocation, botLocationWebSocket } = useLocation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [configForm, setConfigForm] = useState(false);
-  const { yourLocation, defaultLocation, getUserLocation } = useLocation();
+  const { yourLocation, defaultLocation, getUserLocation, arrived, arrivedAt } =
+    useLocation();
   const [config, setConfig] = useState<config | undefined>();
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
+  const [withinRange, setWithinRange] = useState(false);
   const [mapRegion, setMapRegion] = useState({
     latitude: 14.680105493791455,
     longitude: 121.00993905398246,
@@ -70,7 +73,7 @@ const Dashboard = () => {
 
   const checkConfig = async () => {
     try {
-      let url = `http://${ipAddress}:${port}/api/configurations`;
+      let url = `${urlString}/api/configurations`;
 
       let response = await axios.get(url);
 
@@ -125,6 +128,51 @@ const Dashboard = () => {
     return earthRadiusKm * c;
   };
 
+  const isWithinRadius = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+    radius: number = 25
+  ) => {
+    const toRadians = (deg: number) => (deg * Math.PI) / 180;
+
+    const R = 6371000; // Earth's radius in meters
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRadians(lat1)) *
+        Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in meters
+
+    return distance <= radius;
+  };
+
+  useEffect(() => {
+    if (arrived == true) {
+      const checkUser = async () => {
+        const user = await AsyncStorage.getItem("user");
+
+        if (user) {
+          const currentUser = JSON.parse(user);
+
+          if (currentUser._id == arrivedAt) {
+            setModal(true);
+            setMessage("Bot has arrived at the location");
+          }
+        }
+      };
+
+      checkUser();
+    }
+  }, [arrived, arrivedAt]);
+
   const getLocation = async (latitude: any, longitude: any) => {
     const apiKey = "72d5a1df72ec497ea48fbb7f2842a176";
     console.log(latitude, longitude);
@@ -173,7 +221,7 @@ const Dashboard = () => {
 
     if (distance <= 1 && userLoc) {
       try {
-        let url = `http://${ipAddress}:${port}/api/queue`;
+        let url = `${urlString}/api/queue`;
 
         let response = await axios.post(url, {
           userId: userId,
@@ -211,20 +259,20 @@ const Dashboard = () => {
                   className="w-[56px] h-[56px]"
                 />
               </Marker>
-              {config && (
+              {botLocation ? (
                 <Marker
                   coordinate={{
-                    latitude: config.defaultLocation.lat,
-                    longitude: config.defaultLocation.lon,
+                    latitude: botLocation.latitude,
+                    longitude: botLocation.longitude,
                   }}
-                  title="Default Location"
+                  title="Bot Location"
                 >
                   <Image
-                    source={require("../../assets/images/Default-Pin.png")}
+                    source={require("../../assets/images/Bot-Pin.png")}
                     className="w-[56px] h-[56px]"
                   />
                 </Marker>
-              )}
+              ) : null}
             </MapView>
 
             <View className="w-full h-full absolute top-0 left-0">
@@ -276,9 +324,13 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${yourLocation.latitude.toFixed(
-                      4
-                    )}, ${yourLocation.longitude.toFixed(4)}`}
+                    value={
+                      botLocation
+                        ? `${botLocation.latitude.toFixed(
+                            4
+                          )}, ${botLocation.longitude.toFixed(4)}`
+                        : "No Location Data"
+                    }
                   ></TextInput>
                 </View>
                 {/* User */}
@@ -357,6 +409,7 @@ const Dashboard = () => {
           icon="profile"
         />
       )}
+      {}
     </>
   );
 };

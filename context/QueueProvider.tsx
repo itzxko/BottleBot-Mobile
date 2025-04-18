@@ -1,4 +1,4 @@
-import React, { useState, useContext, createContext } from "react";
+import React, { useState, useContext, createContext, useEffect } from "react";
 import { useUrl } from "./UrlProvider";
 import axios from "axios";
 
@@ -6,14 +6,22 @@ const QueueContext = createContext<any>(null);
 
 export const QueueProvider = ({ children }: any) => {
   const [queue, setQueue] = useState([]);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [queueModal, setQueueModal] = useState(false);
 
+  useEffect(() => {
+    const initializeQueue = async () => {
+      await queueWebSocket();
+    };
+
+    initializeQueue();
+  }, []);
+
   const queueWebSocket = () => {
-    const socket = new WebSocket(`ws://${ipAddress}:${port}/api/queue`);
+    const socket = new WebSocket(`${urlString}/api/queue`);
 
     socket.onopen = () => {
-      console.log("WebSocket connection opened");
+      console.log("Queue WebSocket connection opened");
     };
 
     socket.onerror = (error) => {
@@ -21,7 +29,7 @@ export const QueueProvider = ({ children }: any) => {
     };
 
     socket.onclose = () => {
-      console.log("WebSocket connection closed");
+      console.log("Queue WebSocket connection closed");
     };
 
     socket.onmessage = (event) => {
@@ -35,7 +43,7 @@ export const QueueProvider = ({ children }: any) => {
 
   const deleteFromQueue = async (queueId: string) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/queue/${queueId}`;
+      let url = `${urlString}/api/queue/${queueId}`;
 
       let response = await axios.delete(url);
 

@@ -78,7 +78,7 @@ const EditModal = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [level, setLevel] = useState("citizen");
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [changeLevel, setChangeLevel] = useState(true);
@@ -95,7 +95,7 @@ const EditModal = ({
       setLoading(true);
       if (user) {
         try {
-          let url = `http://${ipAddress}:${port}/api/users/${user._id}`;
+          let url = `${urlString}/api/users/${user._id}`;
 
           let response = await axios.get(url);
 
@@ -166,7 +166,7 @@ const EditModal = ({
     Keyboard.dismiss();
     setLoading(true);
     try {
-      let url = `http://${ipAddress}:${port}/api/users/${user?._id}`;
+      let url = `${urlString}/api/users/${user?._id}`;
 
       let response = await axios.put(url, {
         personalInfo: {
@@ -188,8 +188,8 @@ const EditModal = ({
           phoneNumbers: [number],
         },
         economicInfo: {
-          employmentStatus: employmentStatus,
-          occupation: occupation,
+          employmentStatus: "Employed",
+          occupation: "Engineer",
         },
         credentials: {
           email: email,
@@ -461,39 +461,7 @@ const EditModal = ({
                 />
               </View>
             </View>
-            {/* Economic Info */}
-            <View className="w-full py-4">
-              {/* Title */}
-              <View className="w-full flex items-start justify-center pb-4">
-                <Text className="text-sm font-semibold">
-                  Economic Information
-                </Text>
-                <Text className="text-xs font-normal text-black/50">
-                  employment status & occupation
-                </Text>
-              </View>
-              {/* Employment Status */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
-                <Text className="text-xs font-semibold">Employment Status</Text>
-                <TextInput
-                  className="text-xs font-normal max-w-[50%] text-right"
-                  placeholder="status"
-                  numberOfLines={1}
-                  value={employmentStatus}
-                  onChangeText={setEmploymentStatus}
-                ></TextInput>
-              </View>
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
-                <Text className="text-xs font-semibold">Occupation</Text>
-                <TextInput
-                  className="text-xs font-normal max-w-[50%] text-right"
-                  placeholder="work"
-                  numberOfLines={1}
-                  value={occupation}
-                  onChangeText={setOccupation}
-                ></TextInput>
-              </View>
-            </View>
+
             {/* Credentials */}
             <View className="w-full py-4">
               {/* Title */}

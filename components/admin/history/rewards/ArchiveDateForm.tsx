@@ -29,7 +29,7 @@ const ArchiveDateForm = ({
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [showArchiveDatePicker, setShowArchiveDatePicker] = useState(false);
   const [archiveDate, setArchiveDate] = useState<Date | null>(null);
   const [historyData, setHistoryData] = useState<RewardHistory>();
@@ -38,7 +38,7 @@ const ArchiveDateForm = ({
     const fetchData = async () => {
       setLoading(true);
       try {
-        let url = `http://${ipAddress}:${port}/api/history/claim/${data}`;
+        let url = `${urlString}/api/history/claim/${data}`;
         let response = await axios.get(url);
 
         if (response.data.success === true) {
@@ -75,7 +75,7 @@ const ArchiveDateForm = ({
     setLoading(true);
 
     try {
-      let url = `http://${ipAddress}:${port}/api/history/claim/${data}`;
+      let url = `${urlString}/api/history/claim/${data}`;
 
       let response = await axios.put(url, {
         archiveDate: archiveDate,

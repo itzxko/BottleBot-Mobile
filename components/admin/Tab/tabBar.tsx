@@ -6,7 +6,7 @@ import RemixIcon from "react-native-remix-icon";
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
-    <View className="absolute bottom-5 flex-row items-center justify-evenly mx-[50px] bg-white p-4 rounded-2xl shadow-xl shadow-black">
+    <View className="absolute bottom-5 flex-row items-center justify-evenly mx-[40px] bg-white p-4 rounded-2xl shadow-xl shadow-black">
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
@@ -63,6 +63,12 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 />
               ) : route.name === "users" ? (
                 <RemixIcon name="user-smile-fill" size={20} color="#699900" />
+              ) : route.name === "reports" ? (
+                <RemixIcon
+                  name="ri-folder-chart-fill"
+                  size={20}
+                  color="#699900"
+                />
               ) : route.name === "profile" ? (
                 <RemixIcon name="user-4-fill" size={20} color="#699900" />
               ) : null
@@ -76,6 +82,12 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
               <RemixIcon name="calendar-event-line" size={20} color="#699900" />
             ) : route.name === "users" ? (
               <RemixIcon name="user-smile-line" size={20} color="#699900" />
+            ) : route.name === "reports" ? (
+              <RemixIcon
+                name="ri-folder-chart-line"
+                size={20}
+                color="#699900"
+              />
             ) : route.name === "profile" ? (
               <RemixIcon name="user-4-line" size={20} color="#699900" />
             ) : null}

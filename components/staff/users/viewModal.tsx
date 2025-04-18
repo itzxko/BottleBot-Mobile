@@ -286,41 +286,7 @@ const ViewModal = ({
               ></TextInput>
             </View>
           </View>
-          {/* Economic Info */}
-          <View className="w-full py-4">
-            {/* Title */}
-            <View className="w-full flex items-start justify-center pb-4">
-              <Text className="text-sm font-semibold">
-                Economic Information
-              </Text>
-              <Text className="text-xs font-normal text-black/50">
-                employment status & occupation
-              </Text>
-            </View>
-            {/* Employment Status */}
-            <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
-              <Text className="text-xs font-semibold">Employment Status</Text>
-              <TextInput
-                className="text-xs font-normal max-w-[50%] text-right"
-                placeholder="status"
-                numberOfLines={1}
-                value={employmentStatus}
-                onChangeText={setEmploymentStatus}
-                editable={false}
-              ></TextInput>
-            </View>
-            <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
-              <Text className="text-xs font-semibold">Occupation</Text>
-              <TextInput
-                className="text-xs font-normal max-w-[50%] text-right"
-                placeholder="work"
-                numberOfLines={1}
-                value={occupation}
-                onChangeText={setOccupation}
-                editable={false}
-              ></TextInput>
-            </View>
-          </View>
+
           {/* Credentials */}
           <View className="w-full py-4">
             {/* Title */}

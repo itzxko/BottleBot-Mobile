@@ -49,6 +49,13 @@ const _layout = () => {
               }}
             />
             <Tabs.Screen
+              name="reports"
+              options={{
+                headerShown: false,
+                title: "Reports",
+              }}
+            />
+            <Tabs.Screen
               name="profile"
               options={{
                 headerShown: false,

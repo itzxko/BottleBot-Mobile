@@ -8,14 +8,41 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.itzxko.BottleBot"
+    },
+    "notification": {
+      "icon": "./assets/images/Bottle_Bot.png"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/Bottle_Bot.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.itzxko.BottleBot"
+      "package": "com.itzxko.BottleBot",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE",
+        "INTERNET"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB2dl6JPoqsy-H_PjfzF6lnom63z_3E1J0"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
@@ -37,9 +64,13 @@
       "typedRoutes": true
     },
     "extra": {
+      "router": {
+        "origin": false
+      },
       "eas": {
-        "projectId": "507987a1-162a-4c42-925c-a759332a5731"
+        "projectId": "fad98cb7-126b-4133-b3fc-066c43c5cb37"
       }
-    }
+    },
+    "owner": "itzxko0"
   }
 }

@@ -8,7 +8,7 @@ const AdminHistoryContext = createContext<any>(null);
 export const AdminHistoryProvider = ({ children }: any) => {
   const [rewardsHistory, setRewardsHistory] = useState([]);
   const [pointsHistory, setPointsHistory] = useState([]);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [rewardTotalPages, setRewardTotalPages] = useState(0);
   const [pointTotalPages, setPointTotalPages] = useState(0);
 
@@ -20,7 +20,7 @@ export const AdminHistoryProvider = ({ children }: any) => {
   ) => {
     if (pageNumber && limit && status) {
       try {
-        let url = `http://${ipAddress}:${port}/api/history/claim?userName=${userName}&page=${pageNumber}&limit=${limit}&status=${status}`;
+        let url = `${urlString}/api/history/claim?userName=${userName}&page=${pageNumber}&limit=${limit}&status=${status}`;
 
         let response = await axios.get(url);
 
@@ -44,7 +44,7 @@ export const AdminHistoryProvider = ({ children }: any) => {
   ) => {
     if (pageNumber && limit && status) {
       try {
-        let url = `http://${ipAddress}:${port}/api/history/dispose?userName=${userName}&page=${pageNumber}&limit=${limit}&status=${status}`;
+        let url = `${urlString}/api/history/dispose?userName=${userName}&page=${pageNumber}&limit=${limit}&status=${status}`;
 
         let response = await axios.get(url);
 

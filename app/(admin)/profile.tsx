@@ -58,7 +58,7 @@ const profile = () => {
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const route = useRouter();
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const { user, updateUser, logout } = useAuth();
   const [isError, setIsError] = useState(false);
 
@@ -105,7 +105,7 @@ const profile = () => {
 
       if (currentUser) {
         try {
-          let url = `http://${ipAddress}:${port}/api/users/${currentUser._id}`;
+          let url = `${urlString}/api/users/${currentUser._id}`;
 
           let response = await axios.get(url);
 
@@ -155,7 +155,7 @@ const profile = () => {
     setLoading(true);
     if (user) {
       try {
-        let url = `http://${ipAddress}:${port}/api/users/${user._id}`;
+        let url = `${urlString}/api/users/${user._id}`;
 
         const response = await axios.put(url, {
           personalInfo: {
@@ -177,8 +177,8 @@ const profile = () => {
             phoneNumbers: [phoneNumber],
           },
           economicInfo: {
-            employmentStatus: employmentStatus,
-            occupation: occupation,
+            employmentStatus: "Employed",
+            occupation: "Engineer",
           },
           credentials: {
             email: email,
@@ -273,9 +273,7 @@ const profile = () => {
               </View>
               <View className="w-full flex items-start justify-center py-2">
                 <Text className="text-sm font-semibold py-1" numberOfLines={1}>
-                  {!user
-                    ? "loading..."
-                    : `${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
+                  {!user ? "loading..." : `${firstName} ${lastName}`}
                 </Text>
                 <View className="w-full flex flex-row justify-start items-center">
                   <View className="rounded-full  mr-1 max-w-[50%]">
@@ -746,69 +744,7 @@ const profile = () => {
                 </View>
               </View>
             </View>
-            <View className="w-full flex items-start justify-center py-4">
-              <Text className="text-sm font-semibold text-black">
-                Economic Information
-              </Text>
-              <Text className="text-xs font-normal text-black/50 pb-2">
-                employment and occupation
-              </Text>
-              {/* Cards */}
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
-                <View className="w-1/2 flex flex-row items-center justify-start">
-                  <View className="pr-1">
-                    <RemixIcon
-                      name="briefcase-line"
-                      size={14}
-                      color={"rgba(0, 0, 0, 1)"}
-                    />
-                  </View>
-                  <Text
-                    className="text-xs font-semibold text-black"
-                    numberOfLines={1}
-                  >
-                    Employment Status
-                  </Text>
-                </View>
-                <View className="w-1/2 flex items-end justify-center">
-                  <TextInput
-                    className="w-full text-xs font-normal text-right"
-                    numberOfLines={1}
-                    value={employmentStatus}
-                    onChangeText={(text) => setEmploymentStatus(text)}
-                    placeholder="employed or what"
-                    editable={edit ? true : false}
-                  />
-                </View>
-              </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
-                <View className="w-1/2 flex flex-row items-center justify-start">
-                  <View className="pr-1">
-                    <RemixIcon
-                      name="building-2-line"
-                      size={14}
-                      color={"rgba(0, 0, 0, 1)"}
-                    />
-                  </View>
-                  <Text
-                    className="text-xs font-semibold text-black"
-                    numberOfLines={1}
-                  >
-                    Occupation
-                  </Text>
-                </View>
-                <View className="w-1/2 flex items-end justify-center">
-                  <TextInput
-                    className="w-full text-xs font-normal text-right"
-                    numberOfLines={1}
-                    value={occupation}
-                    onChangeText={(text) => setOccupation(text)}
-                    placeholder="work"
-                    editable={edit ? true : false}
-                  />
-                </View>
-              </View>
-            </View>
+
             {/* Security */}
             <View className="w-full flex items-start justify-center py-4">
               <View className="w-full flex items-center justify-center pb-2">

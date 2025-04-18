@@ -44,7 +44,7 @@ const ConfigForm = ({
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
   const [modal, setModal] = useState(false);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
 
   const geocodeAddress = async (address: string) => {
     const apiKey = "72d5a1df72ec497ea48fbb7f2842a176";
@@ -141,7 +141,7 @@ const ConfigForm = ({
         }
       }
 
-      let url = `http://${ipAddress}:${port}/api/configurations/${config?._id}`;
+      let url = `${urlString}/api/configurations/${config?._id}`;
 
       let response = await axios.put(url, {
         defaultLocation: {

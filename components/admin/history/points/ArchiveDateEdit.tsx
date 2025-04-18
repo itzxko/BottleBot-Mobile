@@ -36,7 +36,7 @@ const ArchiveDateEdit = ({
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [showArchiveDatePicker, setShowArchiveDatePicker] = useState(false);
   const [archiveDate, setArchiveDate] = useState<Date | null>(null);
   const [historyData, setHistoryData] = useState<PointsHistory>();
@@ -45,7 +45,7 @@ const ArchiveDateEdit = ({
     const fetchData = async () => {
       setLoading(true);
       try {
-        let url = `http://${ipAddress}:${port}/api/history/dispose/${data}`;
+        let url = `${urlString}/api/history/dispose/${data}`;
         let response = await axios.get(url);
 
         if (response.data.success === true) {
@@ -81,7 +81,7 @@ const ArchiveDateEdit = ({
     setLoading(true);
 
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose/${data}`;
+      let url = `${urlString}/api/history/dispose/${data}`;
 
       let response = await axios.put(url, {
         _id: historyData?._id,

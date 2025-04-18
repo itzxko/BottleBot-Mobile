@@ -10,7 +10,7 @@ export const RewardsProvider = ({ children }: any) => {
   const [totalPages, setTotalPages] = useState();
   const [allRewards, setAllRewards] = useState([]);
 
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
 
   const getRewards = async (
     rewardName: string,
@@ -21,7 +21,7 @@ export const RewardsProvider = ({ children }: any) => {
   ) => {
     if (pageNumber && limit && status) {
       try {
-        let url = `http://${ipAddress}:${port}/api/rewards?rewardName=${rewardName}&category=${category}&page=${pageNumber}&limit=${limit}&status=${status}`;
+        let url = `${urlString}/api/rewards?rewardName=${rewardName}&category=${category}&page=${pageNumber}&limit=${limit}&status=${status}`;
 
         const response = await axios.get(url);
 
@@ -43,7 +43,7 @@ export const RewardsProvider = ({ children }: any) => {
   ) => {
     if (page && limit) {
       try {
-        let url = `http://${ipAddress}:${port}/api/rewards?rewardName=${rewardName}&category=${category}&page=${page}&limit=${limit}&status=active`;
+        let url = `${urlString}/api/rewards?rewardName=${rewardName}&category=${category}&page=${page}&limit=${limit}&status=active`;
 
         let response = await axios.get(url);
 
@@ -59,7 +59,7 @@ export const RewardsProvider = ({ children }: any) => {
 
   const getAllRewards = async () => {
     try {
-      let url = `http://${ipAddress}:${port}/api/rewards?page=1&limit=0`;
+      let url = `${urlString}/api/rewards?page=1&limit=0`;
 
       let response = await axios.get(url);
 

@@ -73,7 +73,7 @@ const ChooseUserEdit = ({
   const { userLimit } = usePagination();
   const { getCitizens, citizens, totalPages } = useUsers();
   const [loading, setLoading] = useState(false);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [userPoints, setUserPoints] = useState<{ [key: string]: number }>({});
   const [message, setMessage] = useState("");
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
@@ -97,7 +97,7 @@ const ChooseUserEdit = ({
       const pointsPromises = citizens.map(async (user: user) => {
         try {
           const response = await axios.get(
-            `http://${ipAddress}:${port}/api/history/claim/points/${user._id}`
+            `${urlString}/api/history/claim/points/${user._id}`
           );
           return {
             userId: user._id,
@@ -133,7 +133,7 @@ const ChooseUserEdit = ({
   const updateRewardHistory = async (userId: string) => {
     setLoading(true);
     try {
-      let url = `http://${ipAddress}:${port}/api/history/claim/${historyId}`;
+      let url = `${urlString}/api/history/claim/${historyId}`;
 
       let response = await axios.put(url, {
         userId: userId,

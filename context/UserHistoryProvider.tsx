@@ -10,7 +10,7 @@ export const UserHistoryProvider = ({ children }: any) => {
   const [rewardsHistory, setRewardsHistory] = useState([]);
   const [pointsTotalPages, setPointsTotalPages] = useState(0);
   const [rewardTotalPages, setRewardTotalPages] = useState(0);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   interface user {
     _id: string;
   }
@@ -23,7 +23,7 @@ export const UserHistoryProvider = ({ children }: any) => {
     limit: number
   ) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose/user/${userId}?startDate=${startDate}&endDate=${endDate}&status=active&page=${pageNumber}&limit=${limit}`;
+      let url = `${urlString}/api/history/dispose/user/${userId}?startDate=${startDate}&endDate=${endDate}&status=active&page=${pageNumber}&limit=${limit}`;
       let response = await axios.get(url);
 
       if (response.data.success === true) {
@@ -46,7 +46,7 @@ export const UserHistoryProvider = ({ children }: any) => {
   ) => {
     if (userId && pageNumber && limit) {
       try {
-        let url = `http://${ipAddress}:${port}/api/history/claim/user/${userId}?startDate=${startDate}&endDate=${endDate}&status=active&page=${pageNumber}&limit=${limit}`;
+        let url = `${urlString}/api/history/claim/user/${userId}?startDate=${startDate}&endDate=${endDate}&status=active&page=${pageNumber}&limit=${limit}`;
         let response = await axios.get(url);
         if (response.data.success === true) {
           setRewardsHistory(response.data.userrewardclaimhistory);

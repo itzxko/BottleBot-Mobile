@@ -8,8 +8,9 @@ export const UsersProvider = ({ children }: any) => {
   const [users, setUsers] = useState([]);
   const [citizens, setCitizens] = useState([]);
   const [roles, setRoles] = useState([]);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [totalPages, setTotalPages] = useState();
+  const [allUsers, setAllUsers] = useState([]);
 
   interface user {
     _id: string;
@@ -42,6 +43,20 @@ export const UsersProvider = ({ children }: any) => {
     };
   }
 
+  const getAllUsers = async () => {
+    try {
+      let url = `${urlString}/api/users?limit=0`;
+
+      let response = await axios.get(url);
+
+      if (response.data.success === true) {
+        setAllUsers(response.data.users);
+      }
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
   const getUsers = async (
     userName: string,
     pageNumber: number,
@@ -50,7 +65,7 @@ export const UsersProvider = ({ children }: any) => {
   ) => {
     if (pageNumber && limit && status) {
       try {
-        let url = `http://${ipAddress}:${port}/api/users?userName=${userName}&page=${pageNumber}&limit=${limit}&status=${status}`;
+        let url = `${urlString}/api/users?userName=${userName}&page=${pageNumber}&limit=${limit}&status=${status}`;
 
         let response = await axios.get(url);
 
@@ -70,7 +85,7 @@ export const UsersProvider = ({ children }: any) => {
     limit: number
   ) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/users?userName=${user}&status=active&level=citizen&page=${pageNumber}&limit=${limit}`;
+      let url = `${urlString}/api/users?userName=${user}&status=active&level=citizen&page=${pageNumber}&limit=${limit}`;
 
       let response = await axios.get(url);
 
@@ -91,6 +106,8 @@ export const UsersProvider = ({ children }: any) => {
         getUsers,
         totalPages,
         getCitizens,
+        allUsers,
+        getAllUsers,
       }}
     >
       {children}

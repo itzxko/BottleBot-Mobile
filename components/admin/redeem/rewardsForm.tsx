@@ -32,11 +32,13 @@ const RewardsForm = ({
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const categories = ["Goods", "Clothing", "Beverage", "Other"];
   const [openCategories, setOpenCategories] = useState(false);
   const { fetchAllRewardsHistory } = useAdminHistory();
   const { getRewards } = useRewards();
+  const { getRewardsHistory } = useAdminHistory();
+  const { getAllRewards } = useRewards();
 
   //Data
   const [rewardName, setRewardName] = useState("");
@@ -60,7 +62,7 @@ const RewardsForm = ({
   const fetchReward = async () => {
     setLoading(true);
     try {
-      let url = `http://${ipAddress}:${port}/api/rewards/${rewardId}`;
+      let url = `${urlString}/api/rewards/${rewardId}`;
 
       let response = await axios.get(url);
 
@@ -154,7 +156,7 @@ const RewardsForm = ({
     formData.append("validUntil", formatDate(validUntil));
 
     try {
-      let url = `http://${ipAddress}:${port}/api/rewards/`;
+      let url = `${urlString}/api/rewards/`;
 
       let response = await axios.post(url, formData, {
         headers: {
@@ -208,7 +210,7 @@ const RewardsForm = ({
     }
 
     try {
-      let url = `http://${ipAddress}:${port}/api/rewards/${rewardId}`;
+      let url = `${urlString}/api/rewards/${rewardId}`;
 
       let response = await axios.post(url, formData, {
         headers: {
@@ -220,6 +222,8 @@ const RewardsForm = ({
         setIsError(false);
         setVisibleModal(true);
         setMessage(response.data.message);
+        await getAllRewards();
+        await getRewardsHistory();
       }
     } catch (error: any) {
       setVisibleModal(true);
@@ -272,10 +276,10 @@ const RewardsForm = ({
                         ? {
                             uri: image.includes("file://")
                               ? image
-                              : `http://${ipAddress}:${port}/api/images/${image}`,
+                              : `${urlString}/api/images/${image}`,
                           }
                         : {
-                            uri: `http://${ipAddress}:${port}/api/images/${rewardImageString}`,
+                            uri: `${urlString}/api/images/${rewardImageString}`,
                           }
                     }
                   ></ImageBackground>

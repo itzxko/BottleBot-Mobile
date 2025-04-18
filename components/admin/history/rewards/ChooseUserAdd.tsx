@@ -71,7 +71,7 @@ const ChooseUserAdd = ({
   const { getCitizens, citizens, totalPages } = useUsers();
   const { userLimit } = usePagination();
   const [loading, setLoading] = useState(false);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [userPoints, setUserPoints] = useState<{ [key: string]: number }>({});
   const [message, setMessage] = useState("");
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
@@ -96,7 +96,7 @@ const ChooseUserAdd = ({
       const pointsPromises = citizens.map(async (user: user) => {
         try {
           const response = await axios.get(
-            `http://${ipAddress}:${port}/api/history/claim/points/${user._id}`
+            `${urlString}/api/history/claim/points/${user._id}`
           );
           return {
             userId: user._id,
@@ -132,13 +132,10 @@ const ChooseUserAdd = ({
   const redeemItem = async (userId: string, rewardId: string) => {
     if (userId) {
       try {
-        const response = await axios.post(
-          `http://${ipAddress}:${port}/api/history/claim`,
-          {
-            userId: userId,
-            rewardId: rewardId,
-          }
-        );
+        const response = await axios.post(`${urlString}/api/history/claim`, {
+          userId: userId,
+          rewardId: rewardId,
+        });
 
         if (response.status === 200) {
           setMessage(response.data.message);

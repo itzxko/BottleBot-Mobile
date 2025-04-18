@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1061487269052",
+    "project_id": "bottlebot-d41cd",
+    "storage_bucket": "bottlebot-d41cd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061487269052:android:00fe4619ff5be00f68ecb9",
+        "android_client_info": {
+          "package_name": "com.itzxko.BottleBot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtJPTh-k4yj5dgJwMXj5de6nohrAYQkQI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

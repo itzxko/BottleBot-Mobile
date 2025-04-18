@@ -10,11 +10,11 @@ const AlertModal = ({ onClose }: { onClose: () => void }) => {
   const [notif, setNotif] = useState(false);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
 
   const returntoDefault = async () => {
     try {
-      let url = `http://${ipAddress}:${[port]}/api/queue`;
+      let url = `${urlString}/api/queue`;
 
       let response = await axios.post(url, {
         returnToDefault: "true",

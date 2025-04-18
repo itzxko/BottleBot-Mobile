@@ -34,12 +34,12 @@ import ScannerModal from "@/components/admin/history/points/ScannerModal";
 
 const History = () => {
   const { user } = useAuth();
-  const { getAllRewards, rewards } = useRewards();
   const [pointsPage, setPointsPage] = useState(false);
   const navigation = useNavigation();
   const [message, setMessage] = useState("");
   const [redeemables, setRedeemables] = useState<RedeemableItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const { getAllRewards, allRewards } = useRewards();
   const {
     getRewardsHistory,
     rewardsHistory,
@@ -50,7 +50,7 @@ const History = () => {
   } = useAdminHistory();
   const { historyLimit } = usePagination();
   const { users, getUsers } = useUsers();
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [rewardSearch, setRewardSearch] = useState("");
   const [pointSearch, setPointSearch] = useState("");
   const [rewardAdd, setRewardAdd] = useState(false);
@@ -69,6 +69,7 @@ const History = () => {
   const [rewardsArchiveForm, setRewardsArchiveForm] = useState(false);
   const [historyData, setHistoryData] = useState("");
   const [openScanner, setOpenScanner] = useState(false);
+  const [pageType, setPageType] = useState("rewards");
 
   interface user {
     _id: string;
@@ -120,11 +121,19 @@ const History = () => {
     _id: string;
   }
 
+  const togglePage = () => {
+    if (pageType === "rewards") {
+      setPageType("points");
+    } else if (pageType === "points") {
+      setPageType("rewards");
+    }
+  };
+
   const archivePointHistory = async (historyId: string) => {
     setLoading(true);
 
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose/${historyId}`;
+      let url = `${urlString}/api/history/dispose/${historyId}`;
 
       let response = await axios.delete(url);
 
@@ -147,7 +156,7 @@ const History = () => {
     console.log(history);
 
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose/${history._id}`;
+      let url = `${urlString}/api/history/dispose/${history._id}`;
 
       let response = await axios.put(url, {
         userId: history.userId,
@@ -174,7 +183,7 @@ const History = () => {
     setLoading(true);
 
     try {
-      let url = `http://${ipAddress}:${port}/api/history/claim/${historyId}`;
+      let url = `${urlString}/api/history/claim/${historyId}`;
 
       let response = await axios.delete(url);
 
@@ -196,7 +205,7 @@ const History = () => {
     setLoading(true);
 
     try {
-      let url = `http://${ipAddress}:${port}/api/history/claim/${history._id}`;
+      let url = `${urlString}/api/history/claim/${history._id}`;
 
       let response = await axios.put(url, {
         archiveDate: null,
@@ -282,7 +291,62 @@ const History = () => {
               <RemixIcon name="arrow-left-s-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
-          <Text className="text-sm font-semibold">History</Text>
+          <View className="flex flex-row items-center justify-center">
+            <View className="flex-row items-center justify-between bg-[#E6E6E6] p-1 rounded-full">
+              {pageType === "rewards" ? (
+                <Pressable onPress={togglePage}>
+                  <LinearGradient
+                    className="flex items-center justify-center px-6 py-2 rounded-full"
+                    colors={["#F0F0F0", "#F0F0F0"]}
+                  >
+                    <Text className="text-xs font-normal text-black">
+                      Rewards
+                    </Text>
+                  </LinearGradient>
+                </Pressable>
+              ) : (
+                <Pressable onPress={togglePage}>
+                  <LinearGradient
+                    className="flex items-center justify-center px-6 py-2 rounded-full"
+                    colors={["#E6E6E6", "#E6E6E6"]}
+                  >
+                    <Text className="text-xs font-normal text-black">
+                      Rewards
+                    </Text>
+                  </LinearGradient>
+                </Pressable>
+              )}
+              {pageType === "points" ? (
+                <Pressable
+                  className="flex items-center justify-center"
+                  onPress={togglePage}
+                >
+                  <LinearGradient
+                    className="flex items-center justify-center px-6 py-2 rounded-full"
+                    colors={["#F0F0F0", "#F0F0F0"]}
+                  >
+                    <Text className="text-xs font-normal text-black">
+                      Points
+                    </Text>
+                  </LinearGradient>
+                </Pressable>
+              ) : (
+                <Pressable
+                  className="flex items-center justify-center"
+                  onPress={togglePage}
+                >
+                  <LinearGradient
+                    className="flex items-center justify-center px-6 py-2 rounded-full"
+                    colors={["#E6E6E6", "#E6E6E6"]}
+                  >
+                    <Text className="text-xs font-normal text-black">
+                      Points
+                    </Text>
+                  </LinearGradient>
+                </Pressable>
+              )}
+            </View>
+          </View>
         </View>
 
         <ScrollView
@@ -290,475 +354,481 @@ const History = () => {
           showsVerticalScrollIndicator={false}
         >
           {/* Titlebar */}
-          <View className="w-full flex flex-row items-center justify-between px-4 py-4">
-            <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
-              <View className="w-6/12 flex-row items-center justify-start">
-                <RemixIcon
-                  name="search-2-line"
-                  size={16}
-                  color={"rgba(0, 0, 0, 0.5)"}
-                />
-                <TextInput
-                  value={rewardSearch}
-                  className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
-                  placeholder="search rewards history"
-                  onChangeText={(text) => {
-                    setRewardSearch(text);
-                    setRewardCurrentPage(1);
-                  }}
-                />
-              </View>
-              <Pressable
-                className="w-4/12 px-4 py-2 flex flex-row items-center justify-between rounded-full bg-[#050301]"
-                onPress={toggleRewardStatus}
-              >
-                <Text
-                  className="text-xs font-normal text-white"
-                  numberOfLines={1}
-                >
-                  {rewardsFilterStatus}
-                </Text>
-                <RemixIcon name="refresh-line" size={16} color="white" />
-              </Pressable>
-            </View>
-          </View>
-          <View className="w-full flex items-center justify-center pt-4">
-            <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
-              <View className="w-full flex flex-row items-center justify-start space-x-2">
-                <Pressable
-                  className="p-2 bg-[#050301] rounded-full"
-                  onPress={() => setRewardAdd(true)}
-                >
-                  <RemixIcon name="add-line" size={16} color="white" />
-                </Pressable>
-                <View className="w-3/4 flex flex-col items-start justify-center">
-                  <Text className="text-sm font-semibold" numberOfLines={1}>
-                    Rewards History
-                  </Text>
-                  <Text
-                    className="text-xs font-normal text-black/50"
-                    numberOfLines={1}
+          {pageType === "rewards" ? (
+            <>
+              <View className="w-full flex flex-row items-center justify-between px-4 py-4">
+                <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
+                  <View className="w-6/12 flex-row items-center justify-start">
+                    <RemixIcon
+                      name="search-2-line"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
+                    <TextInput
+                      value={rewardSearch}
+                      className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
+                      placeholder="search rewards history"
+                      onChangeText={(text) => {
+                        setRewardSearch(text);
+                        setRewardCurrentPage(1);
+                      }}
+                    />
+                  </View>
+                  <Pressable
+                    className="w-4/12 px-4 py-2 flex flex-row items-center justify-between rounded-full bg-[#050301]"
+                    onPress={toggleRewardStatus}
                   >
-                    all records of redeemed rewards
-                  </Text>
+                    <Text
+                      className="text-xs font-normal text-white"
+                      numberOfLines={1}
+                    >
+                      {rewardsFilterStatus}
+                    </Text>
+                    <RemixIcon name="refresh-line" size={16} color="white" />
+                  </Pressable>
                 </View>
               </View>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="flex w-full"
-            >
-              {rewardsHistory.length > 0 ? (
-                rewardsHistory.map(
-                  (rewardHistory: RewardsHistory, index: number) => {
-                    const reward = rewards.find(
-                      (reward: RedeemableItem) =>
-                        reward._id === rewardHistory.rewardId
-                    );
-
-                    const firstItem = index === 0;
-                    const lastItem = index === pointsHistory.length - 1;
-
-                    const margin = firstItem
-                      ? "mx-4"
-                      : lastItem
-                      ? "mr-4"
-                      : "mr-4";
-
-                    return (
-                      <View
-                        className={`bg-slate-500 rounded-[32px] w-[320px] h-[240px] overflow-hidden ${margin}`}
-                        key={rewardHistory._id}
+              <View className="w-full flex items-center justify-center pt-4">
+                <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
+                  <View className="w-full flex flex-row items-center justify-start space-x-2">
+                    <Pressable
+                      className="p-2 bg-[#050301] rounded-full"
+                      onPress={() => setRewardAdd(true)}
+                    >
+                      <RemixIcon name="add-line" size={16} color="white" />
+                    </Pressable>
+                    <View className="w-3/4 flex flex-col items-start justify-center">
+                      <Text className="text-sm font-semibold" numberOfLines={1}>
+                        Rewards History
+                      </Text>
+                      <Text
+                        className="text-xs font-normal text-black/50"
+                        numberOfLines={1}
                       >
-                        <ImageBackground
-                          className="w-full h-full "
-                          source={
-                            reward
-                              ? {
-                                  uri: `http://${ipAddress}:${port}/api/images/${reward.image}`,
-                                }
-                              : require("../../assets/images/borgar.jpg")
-                          }
-                        >
-                          <LinearGradient
-                            className="w-full h-full p-5"
-                            colors={[
-                              "rgba(18, 18, 18, 0)",
-                              "rgba(18, 18, 18, 1)",
-                            ]}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 0, y: 1 }}
+                        all records of redeemed rewards
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  className="flex w-full px-4"
+                >
+                  {rewardsHistory.length > 0 ? (
+                    rewardsHistory.map(
+                      (rewardHistory: RewardsHistory, index: number) => {
+                        const reward = allRewards.find(
+                          (reward: RedeemableItem) =>
+                            reward._id === rewardHistory.rewardId
+                        );
+
+                        return (
+                          <View
+                            className={`bg-slate-500 rounded-[32px] w-full h-[240px] overflow-hidden mb-4`}
+                            key={rewardHistory._id}
                           >
-                            <View className="flex flex-col h-full justify-between">
-                              <View className="w-full flex flex-row items-start justify-between">
-                                <Text
-                                  className="text-xs font-normal text-white/50 uppercase max-w-[50%]"
-                                  numberOfLines={1}
-                                >
-                                  #{rewardHistory._id}
-                                </Text>
-                                <View className="max-w-[40%] flex flex-row items-center justify-end">
-                                  <View className="py-3 px-4 rounded-full flex flex-row items-center justify-center bg-[#050301]/50">
-                                    {rewardHistory.archiveDate === null ? (
-                                      <>
-                                        <Pressable
-                                          className=""
-                                          onPress={() => {
-                                            setRewardEdit(true);
-                                            setRewardHistoryId(
-                                              rewardHistory._id
-                                            );
-                                          }}
+                            <ImageBackground
+                              className="w-full h-full "
+                              source={
+                                reward
+                                  ? {
+                                      uri: `${urlString}/api/images/${reward.image}`,
+                                    }
+                                  : require("../../assets/images/borgar.jpg")
+                              }
+                            >
+                              <LinearGradient
+                                className="w-full h-full p-5"
+                                colors={[
+                                  "rgba(18, 18, 18, 0)",
+                                  "rgba(18, 18, 18, 1)",
+                                ]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 0, y: 1 }}
+                              >
+                                <View className="flex flex-col h-full justify-between">
+                                  <View className="w-full flex flex-row items-start justify-between">
+                                    <Text
+                                      className="text-xs font-normal text-white/50 uppercase max-w-[50%]"
+                                      numberOfLines={1}
+                                    >
+                                      #{rewardHistory._id}
+                                    </Text>
+                                    <View className="max-w-[40%] flex flex-row items-center justify-end">
+                                      <View className="py-3 px-4 rounded-full flex flex-row items-center justify-center bg-[#050301]/50">
+                                        {rewardHistory.archiveDate === null ? (
+                                          <>
+                                            <Pressable
+                                              className=""
+                                              onPress={() => {
+                                                setRewardEdit(true);
+                                                setRewardHistoryId(
+                                                  rewardHistory._id
+                                                );
+                                              }}
+                                            >
+                                              <RemixIcon
+                                                name="edit-2-line"
+                                                size={16}
+                                                color="white"
+                                              />
+                                            </Pressable>
+                                          </>
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </View>
+                                    </View>
+                                  </View>
+                                  <View className="w-full flex items-start justify-center">
+                                    <View className="w-full flex flex-row items-center justify-start pb-2">
+                                      <Text
+                                        className="text-sm font-semibold text-white capitalize max-w-[60%]"
+                                        numberOfLines={1}
+                                      >
+                                        {reward?.rewardName}
+                                      </Text>
+                                      <Text className="text-xs font-normal text-white/50 uppercase max-w-[30%] pl-2">
+                                        {`${rewardHistory.pointsSpent} ${
+                                          rewardHistory.pointsSpent > 1
+                                            ? "pts."
+                                            : "pt."
+                                        }`}
+                                      </Text>
+                                    </View>
+                                    <View className="w-full overflow-hidden flex flex-row justify-start items-center">
+                                      <LinearGradient
+                                        className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[50%]"
+                                        colors={["#699900", "#466600"]}
+                                      >
+                                        <Text
+                                          className="text-xs font-normal text-white"
+                                          numberOfLines={1}
                                         >
-                                          <RemixIcon
-                                            name="edit-2-line"
-                                            size={16}
-                                            color="white"
-                                          />
-                                        </Pressable>
-                                      </>
-                                    ) : (
-                                      <></>
-                                    )}
+                                          {`${rewardHistory.userInfo.personalInfo.firstName} ${rewardHistory.userInfo.personalInfo.lastName}`}
+                                        </Text>
+                                      </LinearGradient>
+                                      <LinearGradient
+                                        className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
+                                        colors={["#699900", "#466600"]}
+                                      >
+                                        <Text
+                                          className="text-xs font-normal text-white"
+                                          numberOfLines={1}
+                                        >
+                                          {(() => {
+                                            const date = new Date(
+                                              rewardHistory.dateClaimed
+                                            );
+                                            return isNaN(date.getTime())
+                                              ? "Invalid Date"
+                                              : date.toLocaleDateString(
+                                                  "en-US"
+                                                );
+                                          })()}
+                                        </Text>
+                                      </LinearGradient>
+                                    </View>
                                   </View>
                                 </View>
-                              </View>
-                              <View className="w-full flex items-start justify-center">
-                                <View className="w-full flex flex-row items-center justify-start pb-2">
-                                  <Text
-                                    className="text-sm font-semibold text-white capitalize max-w-[60%]"
-                                    numberOfLines={1}
-                                  >
-                                    {reward?.rewardName}
-                                  </Text>
-                                  <Text className="text-xs font-normal text-white/50 uppercase max-w-[30%] pl-2">
-                                    {`${rewardHistory.pointsSpent} ${
-                                      rewardHistory.pointsSpent > 1
-                                        ? "pts."
-                                        : "pt."
-                                    }`}
-                                  </Text>
-                                </View>
-                                <View className="w-full overflow-hidden flex flex-row justify-start items-center">
-                                  <LinearGradient
-                                    className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[50%]"
-                                    colors={["#699900", "#466600"]}
-                                  >
-                                    <Text
-                                      className="text-xs font-normal text-white"
-                                      numberOfLines={1}
-                                    >
-                                      {`${rewardHistory.userInfo.personalInfo.firstName} ${rewardHistory.userInfo.personalInfo.lastName}`}
-                                    </Text>
-                                  </LinearGradient>
-                                  <LinearGradient
-                                    className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
-                                    colors={["#699900", "#466600"]}
-                                  >
-                                    <Text
-                                      className="text-xs font-normal text-white"
-                                      numberOfLines={1}
-                                    >
-                                      {(() => {
-                                        const date = new Date(
-                                          rewardHistory.dateClaimed
-                                        );
-                                        return isNaN(date.getTime())
-                                          ? "Invalid Date"
-                                          : date.toLocaleDateString("en-US");
-                                      })()}
-                                    </Text>
-                                  </LinearGradient>
-                                </View>
-                              </View>
-                            </View>
-                          </LinearGradient>
-                        </ImageBackground>
-                      </View>
-                    );
-                  }
-                )
-              ) : (
-                <View className="flex w-[100vw] h-[240px] items-center justify-center">
-                  <View className="p-3 mb-2 rounded-full bg-[#699900]">
-                    <RemixIcon name="blur-off-fill" size={16} color="white" />
-                  </View>
-                  <Text className="text-xs font-normal text-black/50">
-                    No Rewards History Available
-                  </Text>
-                </View>
-              )}
-            </ScrollView>
-            {rewardTotalPages ? (
-              <View className="flex flex-row space-x-2 items-center justify-center py-4">
-                <Pressable
-                  disabled={rewardCurrentPage === 1}
-                  onPress={() => setRewardCurrentPage(rewardCurrentPage - 1)}
-                >
-                  <RemixIcon name="arrow-left-s-line" size={16} color="black" />
-                </Pressable>
-
-                {Array.from(
-                  {
-                    length: Math.min(5, rewardTotalPages),
-                  },
-                  (_, index) => {
-                    const startPage = Math.max(1, rewardCurrentPage - 2);
-                    const page = startPage + index;
-                    return page <= rewardTotalPages ? page : null;
-                  }
-                ).map(
-                  (page) =>
-                    page && ( // Only render valid pages
-                      <Pressable
-                        key={page}
-                        onPress={() => setRewardCurrentPage(page)}
-                        className="p-2"
-                      >
-                        <Text
-                          className={
-                            rewardCurrentPage === page
-                              ? "text-lg font-semibold text-[#466600]"
-                              : "text-xs font-semibold text-black"
-                          }
-                        >
-                          {page}
-                        </Text>
-                      </Pressable>
+                              </LinearGradient>
+                            </ImageBackground>
+                          </View>
+                        );
+                      }
                     )
-                )}
+                  ) : (
+                    <View className="flex w-[100vw] h-[240px] items-center justify-center">
+                      <View className="p-3 mb-2 rounded-full bg-[#699900]">
+                        <RemixIcon
+                          name="blur-off-fill"
+                          size={16}
+                          color="white"
+                        />
+                      </View>
+                      <Text className="text-xs font-normal text-black/50">
+                        No Rewards History Available
+                      </Text>
+                    </View>
+                  )}
+                </ScrollView>
+                {rewardTotalPages ? (
+                  <View className="flex flex-row space-x-2 items-center justify-center py-4">
+                    <Pressable
+                      disabled={rewardCurrentPage === 1}
+                      onPress={() =>
+                        setRewardCurrentPage(rewardCurrentPage - 1)
+                      }
+                    >
+                      <RemixIcon
+                        name="arrow-left-s-line"
+                        size={16}
+                        color="black"
+                      />
+                    </Pressable>
 
-                <Pressable
-                  disabled={rewardCurrentPage === rewardTotalPages}
-                  onPress={() => setRewardCurrentPage(rewardCurrentPage + 1)}
-                >
-                  <RemixIcon
-                    name="arrow-right-s-line"
-                    size={16}
-                    color="black"
-                  />
-                </Pressable>
-              </View>
-            ) : null}
-          </View>
-          <View className="w-full flex flex-row items-center justify-between px-4 py-4">
-            <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
-              <View className="w-6/12 flex-row items-center justify-start">
-                <RemixIcon
-                  name="search-2-line"
-                  size={16}
-                  color={"rgba(0, 0, 0, 0.5)"}
-                />
-                <TextInput
-                  className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
-                  placeholder="search points history"
-                  value={pointSearch}
-                  onChangeText={(text) => {
-                    setPointSearch(text);
-                    setPointCurrentPage(1);
-                  }}
-                  numberOfLines={1}
-                />
-              </View>
-              <Pressable
-                className="w-4/12 px-4 py-2 flex flex-row items-center justify-between rounded-full bg-[#050301]"
-                onPress={togglePointStatus}
-              >
-                <Text
-                  className="text-xs font-normal text-white"
-                  numberOfLines={1}
-                >
-                  {pointsFilterStatus}
-                </Text>
-                <RemixIcon name="refresh-line" size={16} color="white" />
-              </Pressable>
-            </View>
-          </View>
-          <View className="w-full flex items-center justify-center pt-4">
-            <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
-              <View className="w-full flex flex-row items-center justify-start space-x-2">
-                {/* <Pressable
-                  className="p-2 bg-[#050301] rounded-full"
-                  onPress={() => setOpenScanner(true)}
-                >
-                  <RemixIcon name="add-line" size={16} color="white" />
-                </Pressable> */}
-                <View className="w-3/4 flex flex-col items-start justify-center">
-                  <Text className="text-sm font-semibold" numberOfLines={1}>
-                    Points History
-                  </Text>
-                  <Text
-                    className="text-xs font-normal text-black/50"
-                    numberOfLines={1}
-                  >
-                    all records of collected points
-                  </Text>
-                </View>
-              </View>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="flex w-full"
-            >
-              {pointsHistory.length > 0 ? (
-                pointsHistory.map(
-                  (pointHistory: PointsHistory, index: number) => {
-                    const firstItem = index === 0;
-                    const lastItem = index === pointsHistory.length - 1;
-
-                    const margin = firstItem
-                      ? "mx-4"
-                      : lastItem
-                      ? "mr-4"
-                      : "mr-4";
-
-                    return (
-                      <View
-                        className={`bg-slate-500 rounded-[32px] w-[320px] h-[240px] overflow-hidden mr-4 ${margin}`}
-                        key={pointHistory._id}
-                      >
-                        <ImageBackground
-                          className="w-full h-full "
-                          source={require("../../assets/images/Man.jpg")}
-                        >
-                          <LinearGradient
-                            className="w-full h-full p-5"
-                            colors={[
-                              "rgba(18, 18, 18, 0)",
-                              "rgba(18, 18, 18, 0.6)",
-                            ]}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 0, y: 1 }}
+                    {Array.from(
+                      {
+                        length: Math.min(5, rewardTotalPages),
+                      },
+                      (_, index) => {
+                        const startPage = Math.max(1, rewardCurrentPage - 2);
+                        const page = startPage + index;
+                        return page <= rewardTotalPages ? page : null;
+                      }
+                    ).map(
+                      (page) =>
+                        page && ( // Only render valid pages
+                          <Pressable
+                            key={page}
+                            onPress={() => setRewardCurrentPage(page)}
+                            className="p-2"
                           >
-                            <View className="flex flex-col h-full justify-between">
-                              <View className="w-full flex flex-row items-start justify-between">
-                                <Text
-                                  className="text-xs font-normal text-white/50 uppercase max-w-[50%]"
-                                  numberOfLines={1}
-                                >
-                                  #{pointHistory._id}
-                                </Text>
-                              </View>
-                              <View className="w-full flex items-start justify-center">
-                                <View className="w-full flex items-start justify-center pb-4">
-                                  <Text
-                                    className="text-sm font-semibold text-white capitalize"
-                                    numberOfLines={1}
-                                  >
-                                    {pointHistory.userInfo
-                                      ? `${pointHistory.userInfo.personalInfo.firstName} ${pointHistory.userInfo.personalInfo.lastName}`
-                                      : "Non-Mobile User"}
-                                  </Text>
-                                </View>
-                                <View className="w-full overflow-hidden flex flex-row justify-start items-center">
-                                  <LinearGradient
-                                    className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[50%]"
-                                    colors={["#699900", "#466600"]}
-                                  >
-                                    <Text
-                                      className="text-xs font-normal text-white"
-                                      numberOfLines={1}
-                                    >
-                                      {`${pointHistory.bottleCount} ${
-                                        pointHistory.bottleCount > 1
-                                          ? "bottles"
-                                          : "bottle"
-                                      }`}
-                                    </Text>
-                                  </LinearGradient>
-                                  <LinearGradient
-                                    className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
-                                    colors={["#699900", "#466600"]}
-                                  >
-                                    <Text
-                                      className="text-xs font-normal text-white"
-                                      numberOfLines={1}
-                                    >
-                                      {(() => {
-                                        const date = new Date(
-                                          pointHistory.dateDisposed
-                                        );
-                                        return isNaN(date.getTime())
-                                          ? "Invalid Date"
-                                          : date.toLocaleDateString("en-US");
-                                      })()}
-                                    </Text>
-                                  </LinearGradient>
-                                </View>
-                              </View>
-                            </View>
-                          </LinearGradient>
-                        </ImageBackground>
-                      </View>
-                    );
-                  }
-                )
-              ) : (
-                <View className="flex w-[100vw] h-[240px] items-center justify-center">
-                  <View className="p-3 mb-2 rounded-full bg-[#699900]">
-                    <RemixIcon name="blur-off-fill" size={16} color="white" />
+                            <Text
+                              className={
+                                rewardCurrentPage === page
+                                  ? "text-lg font-semibold text-[#466600]"
+                                  : "text-xs font-semibold text-black"
+                              }
+                            >
+                              {page}
+                            </Text>
+                          </Pressable>
+                        )
+                    )}
+
+                    <Pressable
+                      disabled={rewardCurrentPage === rewardTotalPages}
+                      onPress={() =>
+                        setRewardCurrentPage(rewardCurrentPage + 1)
+                      }
+                    >
+                      <RemixIcon
+                        name="arrow-right-s-line"
+                        size={16}
+                        color="black"
+                      />
+                    </Pressable>
                   </View>
-                  <Text className="text-xs font-normal text-black/50">
-                    No Points History Available
-                  </Text>
-                </View>
-              )}
-            </ScrollView>
-            {pointTotalPages ? (
-              <View className="flex flex-row space-x-2 items-center justify-center py-4">
-                <Pressable
-                  disabled={pointCurrentPage === 1}
-                  onPress={() => setPointCurrentPage(pointCurrentPage - 1)}
-                >
-                  <RemixIcon name="arrow-left-s-line" size={16} color="black" />
-                </Pressable>
-
-                {Array.from(
-                  {
-                    length: Math.min(5, pointTotalPages),
-                  },
-                  (_, index) => {
-                    const startPage = Math.max(1, pointCurrentPage - 2);
-                    const page = startPage + index;
-                    return page <= pointTotalPages ? page : null;
-                  }
-                ).map(
-                  (page) =>
-                    page && ( // Only render valid pages
-                      <Pressable
-                        key={page}
-                        onPress={() => setPointCurrentPage(page)}
-                        className="p-2"
-                      >
-                        <Text
-                          className={
-                            pointCurrentPage === page
-                              ? "text-lg font-semibold text-[#466600]"
-                              : "text-xs font-semibold text-black"
-                          }
-                        >
-                          {page}
-                        </Text>
-                      </Pressable>
-                    )
-                )}
-
-                <Pressable
-                  disabled={pointCurrentPage === pointTotalPages}
-                  onPress={() => setPointCurrentPage(pointCurrentPage + 1)}
-                >
-                  <RemixIcon
-                    name="arrow-right-s-line"
-                    size={16}
-                    color="black"
-                  />
-                </Pressable>
+                ) : null}
               </View>
-            ) : null}
-          </View>
-          <View className="pb-32"></View>
+              <View className="pb-32"></View>
+            </>
+          ) : (
+            <>
+              <View className="w-full flex flex-row items-center justify-between px-4 py-4">
+                <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
+                  <View className="w-6/12 flex-row items-center justify-start">
+                    <RemixIcon
+                      name="search-2-line"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
+                    <TextInput
+                      className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
+                      placeholder="search points history"
+                      value={pointSearch}
+                      onChangeText={(text) => {
+                        setPointSearch(text);
+                        setPointCurrentPage(1);
+                      }}
+                      numberOfLines={1}
+                    />
+                  </View>
+                  <Pressable
+                    className="w-4/12 px-4 py-2 flex flex-row items-center justify-between rounded-full bg-[#050301]"
+                    onPress={togglePointStatus}
+                  >
+                    <Text
+                      className="text-xs font-normal text-white"
+                      numberOfLines={1}
+                    >
+                      {pointsFilterStatus}
+                    </Text>
+                    <RemixIcon name="refresh-line" size={16} color="white" />
+                  </Pressable>
+                </View>
+              </View>
+              <View className="w-full flex items-center justify-center pt-4">
+                <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
+                  <View className="w-full flex flex-row items-center justify-start space-x-2">
+                    <View className="w-3/4 flex flex-col items-start justify-center">
+                      <Text className="text-sm font-semibold" numberOfLines={1}>
+                        Points History
+                      </Text>
+                      <Text
+                        className="text-xs font-normal text-black/50"
+                        numberOfLines={1}
+                      >
+                        all records of collected points
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  className="flex w-full px-4"
+                >
+                  {pointsHistory.length > 0 ? (
+                    pointsHistory.map(
+                      (pointHistory: PointsHistory, index: number) => {
+                        return (
+                          <View
+                            className={`bg-slate-500 rounded-[32px] w-full h-[240px] overflow-hidden mb-4`}
+                            key={pointHistory._id}
+                          >
+                            <ImageBackground
+                              className="w-full h-full "
+                              source={require("../../assets/images/Man.jpg")}
+                            >
+                              <LinearGradient
+                                className="w-full h-full p-5"
+                                colors={[
+                                  "rgba(18, 18, 18, 0)",
+                                  "rgba(18, 18, 18, 0.6)",
+                                ]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 0, y: 1 }}
+                              >
+                                <View className="flex flex-col h-full justify-between">
+                                  <View className="w-full flex flex-row items-start justify-between">
+                                    <Text
+                                      className="text-xs font-normal text-white/50 uppercase max-w-[50%]"
+                                      numberOfLines={1}
+                                    >
+                                      #{pointHistory._id}
+                                    </Text>
+                                  </View>
+                                  <View className="w-full flex items-start justify-center">
+                                    <View className="w-full flex items-start justify-center pb-4">
+                                      <Text
+                                        className="text-sm font-semibold text-white capitalize"
+                                        numberOfLines={1}
+                                      >
+                                        {pointHistory.userInfo
+                                          ? `${pointHistory.userInfo.personalInfo.firstName} ${pointHistory.userInfo.personalInfo.lastName}`
+                                          : "Non-Mobile User"}
+                                      </Text>
+                                    </View>
+                                    <View className="w-full overflow-hidden flex flex-row justify-start items-center">
+                                      <LinearGradient
+                                        className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[50%]"
+                                        colors={["#699900", "#466600"]}
+                                      >
+                                        <Text
+                                          className="text-xs font-normal text-white"
+                                          numberOfLines={1}
+                                        >
+                                          {`${pointHistory.bottleCount} ${
+                                            pointHistory.bottleCount > 1
+                                              ? "bottles"
+                                              : "bottle"
+                                          }`}
+                                        </Text>
+                                      </LinearGradient>
+                                      <LinearGradient
+                                        className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
+                                        colors={["#699900", "#466600"]}
+                                      >
+                                        <Text
+                                          className="text-xs font-normal text-white"
+                                          numberOfLines={1}
+                                        >
+                                          {(() => {
+                                            const date = new Date(
+                                              pointHistory.dateDisposed
+                                            );
+                                            return isNaN(date.getTime())
+                                              ? "Invalid Date"
+                                              : date.toLocaleDateString(
+                                                  "en-US"
+                                                );
+                                          })()}
+                                        </Text>
+                                      </LinearGradient>
+                                    </View>
+                                  </View>
+                                </View>
+                              </LinearGradient>
+                            </ImageBackground>
+                          </View>
+                        );
+                      }
+                    )
+                  ) : (
+                    <View className="flex w-[100vw] h-[240px] items-center justify-center">
+                      <View className="p-3 mb-2 rounded-full bg-[#699900]">
+                        <RemixIcon
+                          name="blur-off-fill"
+                          size={16}
+                          color="white"
+                        />
+                      </View>
+                      <Text className="text-xs font-normal text-black/50">
+                        No Points History Available
+                      </Text>
+                    </View>
+                  )}
+                </ScrollView>
+                {pointTotalPages ? (
+                  <View className="flex flex-row space-x-2 items-center justify-center py-4">
+                    <Pressable
+                      disabled={pointCurrentPage === 1}
+                      onPress={() => setPointCurrentPage(pointCurrentPage - 1)}
+                    >
+                      <RemixIcon
+                        name="arrow-left-s-line"
+                        size={16}
+                        color="black"
+                      />
+                    </Pressable>
+
+                    {Array.from(
+                      {
+                        length: Math.min(5, pointTotalPages),
+                      },
+                      (_, index) => {
+                        const startPage = Math.max(1, pointCurrentPage - 2);
+                        const page = startPage + index;
+                        return page <= pointTotalPages ? page : null;
+                      }
+                    ).map(
+                      (page) =>
+                        page && ( // Only render valid pages
+                          <Pressable
+                            key={page}
+                            onPress={() => setPointCurrentPage(page)}
+                            className="p-2"
+                          >
+                            <Text
+                              className={
+                                pointCurrentPage === page
+                                  ? "text-lg font-semibold text-[#466600]"
+                                  : "text-xs font-semibold text-black"
+                              }
+                            >
+                              {page}
+                            </Text>
+                          </Pressable>
+                        )
+                    )}
+
+                    <Pressable
+                      disabled={pointCurrentPage === pointTotalPages}
+                      onPress={() => setPointCurrentPage(pointCurrentPage + 1)}
+                    >
+                      <RemixIcon
+                        name="arrow-right-s-line"
+                        size={16}
+                        color="black"
+                      />
+                    </Pressable>
+                  </View>
+                ) : null}
+              </View>
+              <View className="pb-32"></View>
+            </>
+          )}
         </ScrollView>
       </>
       {loading && <Loader />}

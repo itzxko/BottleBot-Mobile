@@ -38,7 +38,7 @@ const ScannerCheckout = ({
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
 
   //pointsAccumulation
   const [totalPoints, setTotalPoints] = useState<number>(0);
@@ -54,34 +54,28 @@ const ScannerCheckout = ({
 
   const handleScan = ({ data }: BarcodeScanningResult) => {
     setLoading(true);
-    setScanned(true);
 
     try {
-      const parsedData = JSON.parse(data);
-
-      if (scannedIds.has(parsedData.did)) {
+      const scannedData = JSON.parse(data);
+      if (scannedData.uid) {
         setVisibleModal(true);
         setIsError(true);
-        setMessage("Receipt has already been scanned");
-        return;
-      }
-
-      if (parsedData.uid) {
-        setVisibleModal(true);
-        setMessage("User ID Detected! This is for non-mobile users only");
-        setIsError(true);
-      } else if (!parsedData.uid) {
-        const points = Number(parsedData.pa);
-        setTotalPoints((prevTotal) => prevTotal + points);
-        setScannedIds((prevDids) => new Set(prevDids).add(parsedData.did));
-        setVisibleModal(true);
-        setIsError(true);
-        setMessage("QR Receipt scanned successfully");
+        setMessage("This is for non-mobile users only");
+      } else {
+        if (!scannedIds.has(scannedData.transactId)) {
+          scannedIds.add(scannedData.transactId);
+          console.log(scannedIds);
+          setTotalPoints(Number(totalPoints) + Number(scannedData.pa));
+        } else {
+          setMessage("QR Already Scanned");
+          setVisibleModal(true);
+          setIsError(true);
+        }
       }
     } catch (error: any) {
-      setVisibleModal(true);
-      setIsError(true);
+      setIsError(false);
       setMessage("Invalid QR Code");
+      setVisibleModal(true);
     } finally {
       setLoading(false);
     }
@@ -90,17 +84,18 @@ const ScannerCheckout = ({
   const handleCheckout = async () => {
     if (reward) {
       try {
-        if (totalPoints >= reward?.pointsRequired) {
-          let url = `http://${ipAddress}:${port}/api/history/claim`;
+        if (totalPoints >= reward.pointsRequired) {
+          console.log("shit");
+          let url = `${urlString}/api/history/claim`;
 
           let response = await axios.post(url, {
-            rewardId: reward?._id,
+            rewardId: reward._id,
           });
 
           if (response.data.success === true) {
             setVisibleModal(true);
-            setIsError(false);
             setMessage(response.data.message);
+            setIsError(false);
           }
         } else {
           setIsError(true);

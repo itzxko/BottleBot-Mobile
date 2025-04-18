@@ -31,7 +31,7 @@ const Users = () => {
   const { users, getUsers, totalPages } = useUsers();
   const [editModal, setEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [filterStatus, setFilterStatus] = useState("active");
   const [userSearch, setUserSearch] = useState("");
   const [user, setUser] = useState<any>(null);
@@ -100,7 +100,7 @@ const Users = () => {
   const archiveUser = async (userId: string) => {
     setLoading(true);
     try {
-      let url = `http://${ipAddress}:${port}/api/users/${userId}`;
+      let url = `${urlString}/api/users/${userId}`;
       let response = await axios.delete(url);
 
       if (response.data.success === true) {
@@ -121,7 +121,7 @@ const Users = () => {
   const unarchiveUser = async (user: user) => {
     setLoading(true);
     try {
-      let url = `http://${ipAddress}:${port}/api/users/${user._id}`;
+      let url = `${urlString}/api/users/${user._id}`;
 
       let response = await axios.put(url, {
         archiveDate: null,
@@ -154,7 +154,6 @@ const Users = () => {
           <TouchableHighlight
             underlayColor={"#C9C9C9"}
             className="absolute left-0 rounded-full"
-            onPress={() => console.log()}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
               <RemixIcon name="arrow-left-s-line" size={16} color="black" />

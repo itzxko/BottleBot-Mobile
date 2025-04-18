@@ -16,16 +16,27 @@ import axios from "axios";
 import Loader from "@/components/loader";
 import WeatherForm from "@/components/admin/monitor/WeatherForm";
 import AlertModal from "@/components/admin/monitor/AlertModal";
+import { useLocation } from "@/context/LocationProvider";
 
 const monitor = () => {
-  const { queue, deleteFromQueue } = useQueue();
+  const { queue, deleteFromQueue, queueWebSocket } = useQueue();
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [rainyHours, setRainyHours] = useState<any[]>([]);
-  const [todayRain, setTodayRain] = useState("");
+
   const [showWeatherForm, setShowWeatherForm] = useState(false);
+  const {
+    battery,
+    overflow,
+    orientation,
+    waterLevel,
+    botLocationWebSocket,
+    fetchAndFilterRainyHours,
+    todayRain,
+    date,
+    rainyHours,
+  } = useLocation();
   const [alertModal, setAlertModal] = useState(false);
-  const [date, setDate] = useState("");
+
   interface queue {
     userId: {
       personalInfo: {
@@ -42,87 +53,17 @@ const monitor = () => {
     _id: string;
   }
 
-  const fetchAndFilterRainyHours = async () => {
-    const apiKey = "PQSRXB9VVDCDL87R3T6ZHPE83";
-    const city = "Caloocan";
-    setLoading(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
 
-    try {
-      const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=metric&key=${apiKey}&contentType=json`;
-      const response = await axios.get(url);
-
-      // const todayDate = new Date().toISOString().split("T")[0];
-      const todayDate = new Date().toISOString().split("T")[0];
-
-      const todayForecast = response.data.days.find(
-        (day: any) => day.datetime === todayDate
-      );
-      setTodayRain(todayForecast.precipprob);
-      setDate(todayDate);
-
-      if (todayForecast && todayForecast.hours) {
-        const filteredRainyHours = todayForecast.hours.filter(
-          (hour: any) => hour.precipprob > 30
-        );
-        setRainyHours(filteredRainyHours);
-      }
-    } catch (error: any) {
-      setIsError(true);
-      console.error(error);
-    } finally {
+      await queueWebSocket();
+      await botLocationWebSocket();
       setLoading(false);
-    }
-  };
-
-  const convertToTime = (timeString: string) => {
-    const [hours, minutes] = timeString.split(":");
-    const date = new Date();
-    date.setHours(parseInt(hours, 10));
-    date.setMinutes(parseInt(minutes, 10));
-
-    const options: Intl.DateTimeFormatOptions = {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
     };
-    return date.toLocaleTimeString([], options);
-  };
 
-  useEffect(() => {
-    fetchAndFilterRainyHours();
+    fetchData();
   }, []);
-
-  const convertToHour = (timeString: string) => {
-    const hour = parseInt(timeString.split(":")[0], 10); // Extract the hour part
-    if (isNaN(hour)) {
-      console.error("Invalid time:", timeString);
-      return NaN;
-    }
-    return hour; // Return the hour
-  };
-
-  const checkCurrentTime = () => {
-    const currentTime = new Date();
-    const currentHour = currentTime.getHours();
-    const currentMinute = currentTime.getMinutes();
-
-    const matchFound = rainyHours.some((rainyHour) => {
-      const rainyHourValue = convertToHour(rainyHour.datetime);
-
-      if (currentHour === rainyHourValue) {
-        return currentMinute >= 0 && currentMinute < 60;
-      }
-      return false;
-    });
-
-    if (matchFound) {
-      setAlertModal(true);
-    }
-  };
-
-  useEffect(() => {
-    checkCurrentTime();
-  }, [rainyHours]);
 
   return (
     <>
@@ -148,10 +89,35 @@ const monitor = () => {
             <View className="w-full flex flex-col items-start justify-center pb-8">
               <Text className="text-sm font-semibold">Bot Status</Text>
               <Text className="text-xs font-normal text-black/50">
-                power supply, sim module, capacity
+                battery, overflow, water evel etc.
               </Text>
             </View>
             <View className="w-full flex flex-col items-center justify-center space-y-2">
+              {/* battery */}
+              <LinearGradient
+                colors={["#050301", "#3B3B3B"]}
+                start={{ x: 0, y: 1 }}
+                end={{ x: 1, y: 0 }}
+                className="w-full rounded-2xl flex flex-row items-center justify-between px-6 py-4"
+              >
+                <View className="w-1/2 flex flex-row items-center justify-start gap-x-2">
+                  <RemixIcon name="ri-battery-line" size={16} color="white" />
+                  <Text
+                    className="text-xs font-normal text-white"
+                    numberOfLines={1}
+                  >
+                    Battery
+                  </Text>
+                </View>
+                <View className="w-1/2 flex flex-row items-center justify-end gap-x-2">
+                  <Text
+                    className="text-xs font-normal text-white"
+                    numberOfLines={1}
+                  >
+                    {battery ? battery : "Waiting for Data"}
+                  </Text>
+                </View>
+              </LinearGradient>
               {/* overflow */}
               <LinearGradient
                 colors={["#050301", "#3B3B3B"]}
@@ -173,7 +139,7 @@ const monitor = () => {
                     className="text-xs font-normal text-white"
                     numberOfLines={1}
                   >
-                    90%
+                    {overflow ? overflow : "Waiting for Data"}
                   </Text>
                 </View>
               </LinearGradient>
@@ -198,7 +164,7 @@ const monitor = () => {
                     className="text-xs font-normal text-white"
                     numberOfLines={1}
                   >
-                    90%
+                    {waterLevel ? waterLevel : "Waiting for Data"}
                   </Text>
                 </View>
               </LinearGradient>
@@ -223,7 +189,9 @@ const monitor = () => {
                     className="text-xs font-normal text-white"
                     numberOfLines={1}
                   >
-                    90%
+                    {orientation
+                      ? `${orientation > 0 ? "Tilted" : "Normal"}`
+                      : "Waiting for Data"}
                   </Text>
                 </View>
               </LinearGradient>
@@ -248,7 +216,7 @@ const monitor = () => {
                     className="text-xs font-normal text-white"
                     numberOfLines={1}
                   >
-                    {todayRain !== null ? `${todayRain}%` : "No Data"}
+                    {todayRain !== null ? `${todayRain}%` : "Waiting for Data"}
                   </Text>
                   <Pressable onPress={() => setShowWeatherForm(true)}>
                     <LinearGradient

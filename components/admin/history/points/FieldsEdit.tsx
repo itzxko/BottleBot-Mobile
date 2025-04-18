@@ -58,7 +58,7 @@ const FieldsEdit = ({
 }) => {
   const [bottleCount, setBottleCount] = useState("");
   const [pointsAccumulated, setPointsAccumulated] = useState("");
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -67,7 +67,7 @@ const FieldsEdit = ({
   const updatePointHistory = async () => {
     setLoading(true);
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose/${historyId}`;
+      let url = `${urlString}/api/history/dispose/${historyId}`;
 
       let response = await axios.put(url, {
         userId: user?._id,

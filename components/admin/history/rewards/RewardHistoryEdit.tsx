@@ -39,7 +39,7 @@ const RewardHistoryEdit = ({
   const [filtered, setFiltered] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [chooseModal, setChooseModal] = useState(false);
   const [selectedReward, setSelectedReward] = useState<Item | null>(null);
   const { fetchAllRewardsHistory } = useAdminHistory();
@@ -177,7 +177,7 @@ const RewardHistoryEdit = ({
                     <ImageBackground
                       className="w-full flex-1"
                       source={{
-                        uri: `http://${ipAddress}:${port}/api/images/${item.image}`,
+                        uri: `${urlString}/api/images/${item.image}`,
                       }}
                     ></ImageBackground>
                   </View>

@@ -16,13 +16,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import Modal from "../components/modal";
 import { useAuth } from "@/context/AuthContext";
 import { useUrl } from "@/context/UrlProvider";
-import { useQueue } from "@/context/QueueProvider";
 import RemixIcon from "react-native-remix-icon";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import Loader from "@/components/loader";
-import { useLocation } from "@/context/LocationProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import { Platform } from "react-native";
+import Constants from "expo-constants";
 
 export default function Login() {
   const [hidePass, setHidePass] = useState(true);
@@ -32,9 +34,8 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const route = useRouter();
   const { setToken, setUser } = useAuth();
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [loading, setLoading] = useState(false);
-  const { queueWebSocket } = useQueue();
 
   const togglePassword = () => {
     setHidePass(!hidePass);
@@ -44,7 +45,7 @@ export default function Login() {
     Keyboard.dismiss();
     setLoading(true);
     try {
-      let url = `http://${ipAddress}:${port}/api/auth/login`;
+      let url = `${urlString}/api/auth/login`;
 
       let response = await axios.post(url, {
         email: email,
@@ -88,7 +89,7 @@ export default function Login() {
             start={{ x: 0, y: 1 }} // Bottom-left corner
             end={{ x: 1, y: 0 }} // Top-right corner
           >
-            <SafeAreaView className="w-full flex bg-[#F6F6F6] rounded-3xl items-center justify-center py-16 px-6">
+            <SafeAreaView className="w-full flex bg-[#F6F6F6] rounded-b-3xl items-center justify-center py-16 px-6">
               <View className="w-full flex items-center justify-center pb-4">
                 <Image
                   source={require("../assets/images/Bottle_Bot.png")}

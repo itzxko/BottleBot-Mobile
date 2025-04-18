@@ -55,7 +55,7 @@ const FieldsAdd = ({
 }) => {
   const [bottleCount, setBottleCount] = useState("");
   const [pointsAccumulated, setPointsAccumulated] = useState("");
-  const { ipAddress, port } = useUrl();
+  const { ipAddress, port, urlString } = useUrl();
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -64,7 +64,7 @@ const FieldsAdd = ({
   const addPointsHistory = async () => {
     setLoading(true);
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose`;
+      let url = `${urlString}/api/history/dispose`;
 
       let response = await axios.post(url, {
         userId: user?._id,
